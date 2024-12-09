@@ -189,9 +189,20 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     boundary = left
     diffusivity = diffusivity_Li2O_nonAD
   []
+  [avg_flux_upper]
+    type = SideDiffusiveFluxAverage
+    variable = deuterium_concentration_Li2O
+    boundary = upper
+    diffusivity = diffusivity_Li2O_nonAD
+  []
+  [avg_flux_left_upper_sum]
+    type = ParsedPostprocessor
+    expression = 'avg_flux_left + avg_flux_upper'
+    pp_names = 'avg_flux_left avg_flux_upper'
+  []
   [avg_flux_total] # total flux coming out of the sample in atoms/microns^2/s
     type = ScalePostprocessor
-    value = avg_flux_left
+    value = avg_flux_left_upper_sum
     scaling_factor = '${fparse 4 * concentration_scaling}'
     # Factor of 2 because symmetry is assumed and only one-half of the specimen is modeled.
     # Thus, the total flux coming out of the specimen (per unit area)
