@@ -48,9 +48,9 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
   [cmg]
     type = CartesianMeshGenerator
     dim = 2
-    dx = '40 * ${node_length_Li2O}'
+    dx = '${fparse 40 * ${node_length_Li2O}}'
     ix = '40'
-    dy = '40 * ${node_length_Li2O}'
+    dy = '${fparse 40 * ${node_length_Li2O}}'
     iy = '40'
     subdomain_id = '0'
 
@@ -123,7 +123,7 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     type = EquilibriumBC
     Ko = ${solubility_constant_Li2O}
     activation_energy = '${fparse solubility_energy_Li2O * R}'
-    boundary = upper
+    boundary = top
     enclosure_var = enclosure_pressure
     temperature = temperature
     variable = deuterium_concentration_Li2O
@@ -192,7 +192,7 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
   [avg_flux_upper]
     type = SideDiffusiveFluxAverage
     variable = deuterium_concentration_Li2O
-    boundary = upper
+    boundary = top
     diffusivity = diffusivity_Li2O_nonAD
   []
   [avg_flux_left_upper_sum]
