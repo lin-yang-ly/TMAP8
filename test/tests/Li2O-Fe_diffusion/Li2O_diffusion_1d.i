@@ -56,7 +56,7 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 []
 
 [Variables]
-  [deuterium_concentration_Li2O] # (atoms/microns^3) / concentration_scaling
+  [tritium_concentration_Li2O] # (atoms/microns^3) / concentration_scaling
     block = 0
   []
 []
@@ -74,11 +74,11 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 [Kernels]
   [time_Li2O]
     type = TimeDerivative
-    variable = deuterium_concentration_Li2O
+    variable = tritium_concentration_Li2O
   []
   [diffusion_Li2O]
     type = ADMatDiffusion
-    variable = deuterium_concentration_Li2O
+    variable = tritium_concentration_Li2O
     diffusivity = diffusivity_Li2O
   []
 []
@@ -108,13 +108,13 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     boundary = left
     enclosure_var = enclosure_pressure
     temperature = temperature
-    variable = deuterium_concentration_Li2O
+    variable = tritium_concentration_Li2O
     p = ${solubility_order}
   []
   [right_flux]
     type = ADNeumannBC
     boundary = right
-    variable = deuterium_concentration_Li2O
+    variable = tritium_concentration_Li2O
     value = 0
   []
 []
@@ -167,18 +167,19 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 [Postprocessors]
   [avg_flux_left]
     type = SideDiffusiveFluxAverage
-    variable = deuterium_concentration_Li2O
+    variable = tritium_concentration_Li2O
     boundary = left
     diffusivity = diffusivity_Li2O_nonAD
   []
   [avg_flux_total] # total flux coming out of the sample in atoms/microns^2/s
     type = ScalePostprocessor
     value = avg_flux_left
-    scaling_factor = '${fparse 2 * concentration_scaling}'
+    scaling_factor = '${concentration_scaling}' #${fparse 2 * concentration_scaling}'
     # Factor of 2 because symmetry is assumed and only one-half of the specimen is modeled.
     # Thus, the total flux coming out of the specimen (per unit area)
     # is twice the flux calculated at the left side of the domain.
     # The 'concentration_scaling' parameter is used to get a consistent concentration unit
+    # But for average flux, we shouldn't use the factor of 2 here.
   []
   [temperature]
     type = ElementAverageValue

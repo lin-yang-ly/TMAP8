@@ -44,15 +44,19 @@ def numerical_solution_on_experiment_input(experiment_input, tmap_input, tmap_ou
         new_tmap_output[i] = (experiment_input[i] - tmap_input[left_limit]) / (tmap_input[right_limit] - tmap_input[left_limit]) * (tmap_output[right_limit] - tmap_output[left_limit]) + tmap_output[left_limit]
     return new_tmap_output
 
+################################################################################
+################################# 1D DIFFUSION #################################
+################################################################################
+
 #===============================================================================
-# Extract Fe and Li2O predictions
+# Extract Fe and Li2O predictions in 1D model
 
 if "/TMAP8/doc/" in script_folder:     # if in documentation folder
     csv_folder_Fe = "../../../../test/tests/val-2b/gold/Fe_diffusion_1d_out.csv"
     csv_folder_Li2O = "../../../../test/tests/val-2b/gold/Li2O_diffusion_1d_out.csv"
 else:                                  # if in test folder
-    csv_folder_Fe = "./gold/Fe_diffusion_1d_out.csv"
-    csv_folder_Li2O = "./gold/Li2O_diffusion_1d_out.csv"
+    csv_folder_Fe = "../gold/Fe_diffusion_1d_out.csv"
+    csv_folder_Li2O = "../gold/Li2O_diffusion_1d_out.csv"
 
 tmap_solution_Fe = pd.read_csv(csv_folder_Fe)
 tmap_time_Fe = tmap_solution_Fe['time'] # s
@@ -127,7 +131,7 @@ ax2.set_xlim(left=0)
 ax2.set_yscale('log')
 ax2.minorticks_on()
 
-plt.savefig('Fe_temperature_pressure_history.png', bbox_inches='tight', dpi=300)
+plt.savefig('../python_figures/Fe_temperature_pressure_history.png', bbox_inches='tight', dpi=300)
 plt.close(fig)
 
 #===============================================================================
@@ -147,5 +151,77 @@ ax.legend(loc="best")
 ax.set_ylim(bottom=0)
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
 ax.minorticks_on()
-plt.savefig('Fe_Li2O_comparison.png', bbox_inches='tight', dpi=300)
+plt.savefig('../python_figures/Fe_Li2O_comparison_1D.png', bbox_inches='tight', dpi=300)
+plt.close(fig)
+
+################################################################################
+################################# 2D DIFFUSION #################################
+################################################################################
+
+# ============================================================================ #
+# Extract Fe and Li2O predictions in 2D model
+
+if "/TMAP8/doc/" in script_folder:     # if in documentation folder
+    csv_folder_Fe = "../../../../test/tests/val-2b/gold/Fe_diffusion_2d_out.csv"
+    csv_folder_Li2O = "../../../../test/tests/val-2b/gold/Li2O_diffusion_2d_out.csv"
+else:                                  # if in test folder
+    csv_folder_Fe = "../gold/Fe_diffusion_2d_out.csv"
+    csv_folder_Li2O = "../gold/Li2O_diffusion_2d_out.csv"
+
+tmap_solution_Fe = pd.read_csv(csv_folder_Fe)
+tmap_time_Fe = tmap_solution_Fe['time'] # s
+tmap_temperature_Fe = tmap_solution_Fe['temperature'] # K
+tmap_pressure_Fe = tmap_solution_Fe['enclosure_pressure'] # Pa
+tmap_flux_Fe = tmap_solution_Fe['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
+
+tmap_solution_Li2O = pd.read_csv(csv_folder_Li2O)
+tmap_time_Li2O = tmap_solution_Li2O['time'] # s
+tmap_temperature_Li2O = tmap_solution_Li2O['temperature'] # K
+tmap_pressure_Li2O = tmap_solution_Li2O['enclosure_pressure'] # Pa
+tmap_flux_Li2O = tmap_solution_Li2O['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
+
+# select only the simulation data for desorption
+tmap_time_desorption_Fe = []
+tmap_temperature_desorption_Fe = []
+tmap_flux_desorption_Fe = []
+for i in range(len(tmap_time_Fe)):
+    if tmap_time_Fe[i]>=start_time_desorption:
+        tmap_time_desorption_Fe.append(tmap_time_Fe[i])
+        tmap_temperature_desorption_Fe.append(tmap_temperature_Fe[i])
+        tmap_flux_desorption_Fe.append(tmap_flux_Fe[i])
+tmap_time_desorption_Fe = np.array(tmap_time_desorption_Fe)
+tmap_temperature_desorption_Fe = np.array(tmap_temperature_desorption_Fe)
+tmap_flux_desorption_Fe = np.array(tmap_flux_desorption_Fe)
+
+tmap_time_desorption_Li2O = []
+tmap_temperature_desorption_Li2O = []
+tmap_flux_desorption_Li2O = []
+for i in range(len(tmap_time_Li2O)):
+    if tmap_time_Li2O[i]>=start_time_desorption:
+        tmap_time_desorption_Li2O.append(tmap_time_Li2O[i])
+        tmap_temperature_desorption_Li2O.append(tmap_temperature_Li2O[i])
+        tmap_flux_desorption_Li2O.append(tmap_flux_Li2O[i])
+tmap_time_desorption_Li2O = np.array(tmap_time_desorption_Li2O)
+tmap_temperature_desorption_Li2O = np.array(tmap_temperature_desorption_Li2O)
+tmap_flux_desorption_Li2O = np.array(tmap_flux_desorption_Li2O)
+
+# ============================================================================ #
+# Plot comparison between TMAP8 predictions and experimental data
+
+fig = plt.figure(figsize=[6.5, 5.5])
+gs = gridspec.GridSpec(1, 1)
+ax = fig.add_subplot(gs[0])
+
+# ax.scatter(experiment_temperature, experiment_flux,label=r"Experiment", c='k', marker='^')
+ax.plot(tmap_temperature_desorption_Fe, tmap_flux_desorption_Fe, label=r"Fe", c='tab:blue')
+ax.plot(tmap_temperature_desorption_Li2O, tmap_flux_desorption_Li2O, label=r"Li2O", c='tab:orange')
+
+ax.set_xlabel(u'Temperature (K)')
+ax.set_ylabel(u"Tritium flux (atom/m$^2$/s)")
+ax.legend(loc="best")
+ax.set_ylim(bottom=0)
+# plt.yscale("log")
+plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
+ax.minorticks_on()
+plt.savefig('../python_figures/Fe_Li2O_comparison_2D.png', bbox_inches='tight', dpi=300)
 plt.close(fig)

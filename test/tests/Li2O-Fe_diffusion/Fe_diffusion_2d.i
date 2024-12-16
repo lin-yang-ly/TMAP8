@@ -23,13 +23,13 @@ cooldown_duration = ${units 5 h -> s}
 desorption_duration = ${fparse (temperature_desorption_max-temperature_desorption_min)/desorption_heating_rate}
 endtime = ${fparse charge_time + cooldown_duration + desorption_duration}
 
-# Materials properties (T: Diff data From Guggi 1983, Solu from Kudo 1991)
+# Materials properties (T: Diff data From Naoe 2008, Solu from Ratier 1985)
 concentration_scaling = 1e10 # (-)
-diffusion_Li2O_preexponential = ${units ${fparse exp(-5.93) * 1e-4} m^2/s -> mum^2/s} # Tritium
-diffusion_Li2O_energy = ${units ${fparse 81.73 * 1e3 / ${R}} K}
+diffusion_Fe_preexponential = ${units 1.9e-6 m^2/s -> mum^2/s} # Tritium
+diffusion_Fe_energy = ${units ${fparse 61300 / ${R}} K}
 solubility_order = .5 # order of the solubility law (Here, we use Sievert's law)
-solubility_constant_Li2O = ${fparse 2.0568216e-05 * 4.04e28 / 1e18 / concentration_scaling} # at/m^3/Pa^0.5 -> at/mum^3/Pa^0.5}
-solubility_energy_Li2O = ${units 1290 K}
+solubility_constant_Fe = ${fparse 1.87e-6 / 3.016 * 55.845 * 4.04e28 / 1e18 / concentration_scaling} # at/m^3/Pa^0.5 -> at/mum^3/Pa^0.5}
+solubility_energy_Fe = ${units ${fparse 8240 / ${R}} K}
 
 # Numerical parameters
 dt_max_large = ${units 100 s}
@@ -39,18 +39,18 @@ dt_start_cooldown = ${units 10 s}
 dt_start_desorption = ${units 1 s}
 
 # Geometry and mesh
-length_Li2O = ${units 0.4 mm -> mum}
-length_Li2O_modeled = ${fparse length_Li2O/2}
-num_nodes_Li2O = 40
-node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
+length_Fe = ${units 0.4 mm -> mum}
+length_Fe_modeled = ${fparse length_Fe/2}
+num_nodes_Fe = 40
+node_length_Fe = ${fparse length_Fe_modeled / num_nodes_Fe}
 
 [Mesh]
   [cmg]
     type = CartesianMeshGenerator
     dim = 2
-    dx = '${fparse 40 * ${node_length_Li2O}}'
+    dx = '${fparse 40 * ${node_length_Fe}}'
     ix = '40'
-    dy = '${fparse 40 * ${node_length_Li2O}}'
+    dy = '${fparse 40 * ${node_length_Fe}}'
     iy = '40'
     subdomain_id = '0'
 
@@ -58,7 +58,7 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 []
 
 [Variables]
-  [tritium_concentration_Li2O] # (atoms/microns^3) / concentration_scaling
+  [tritium_concentration_Fe] # (atoms/microns^3) / concentration_scaling
     block = 0
   []
 []
@@ -74,14 +74,14 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 []
 
 [Kernels]
-  [time_Li2O]
+  [time_Fe]
     type = TimeDerivative
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
   []
-  [diffusion_Li2O]
+  [diffusion_Fe]
     type = ADMatDiffusion
-    variable = tritium_concentration_Li2O
-    diffusivity = diffusivity_Li2O
+    variable = tritium_concentration_Fe
+    diffusivity = diffusivity_Fe
   []
 []
 
@@ -105,34 +105,34 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 [BCs]
   [left_flux]
     type = EquilibriumBC
-    Ko = ${solubility_constant_Li2O}
-    activation_energy = '${fparse solubility_energy_Li2O * R}'
+    Ko = ${solubility_constant_Fe}
+    activation_energy = '${fparse solubility_energy_Fe * R}'
     boundary = left
     enclosure_var = enclosure_pressure
     temperature = temperature
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     p = ${solubility_order}
   []
   [right_flux]
     type = ADNeumannBC
     boundary = right
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     value = 0
   []
   [upper_flux]
     type = EquilibriumBC
-    Ko = ${solubility_constant_Li2O}
-    activation_energy = '${fparse solubility_energy_Li2O * R}'
+    Ko = ${solubility_constant_Fe}
+    activation_energy = '${fparse solubility_energy_Fe * R}'
     boundary = top
     enclosure_var = enclosure_pressure
     temperature = temperature
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     p = ${solubility_order}
   []
   [bottom_flux]
     type = ADNeumannBC
     boundary = bottom
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     value = 0
   []
 []
@@ -146,21 +146,21 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
                             ${temperature_initial}-((1-exp(-(t-${charge_time})/${cooldown_time_constant}))*${fparse temperature_initial - temperature_cooldown_min}),
                             ${temperature_desorption_min}+${desorption_heating_rate}*(t-${fparse charge_time + cooldown_duration})))'
   []
-  [diffusivity_Li2O_func]
+  [diffusivity_Fe_func]
     type = ParsedFunction
     symbol_names = 'T'
     symbol_values = 'temperature_bc_func'
-    expression = '${diffusion_Li2O_preexponential}*exp(-${diffusion_Li2O_energy}/T)'
+    expression = '${diffusion_Fe_preexponential}*exp(-${diffusion_Fe_energy}/T)'
   []
   [enclosure_pressure_func]
     type = ParsedFunction
     expression = 'if(t<${charge_time}, ${pressure_enclosure_init}, if(t<${fparse charge_time + cooldown_duration}, ${pressure_enclosure_cooldown}, ${pressure_enclosure_desorption}))'
   []
-  [solubility_Li2O_func]
+  [solubility_Fe_func]
     type = ParsedFunction
     symbol_names = 'T'
     symbol_values = 'temperature_bc_func'
-    expression = '${solubility_constant_Li2O} * exp(-${solubility_energy_Li2O}/T)'
+    expression = '${solubility_constant_Fe} * exp(-${solubility_energy_Fe}/T)'
   []
   [max_time_step_size_func]
     type = ParsedFunction
@@ -171,29 +171,29 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 [Materials]
   [diffusion_solubility]
     type = ADGenericFunctionMaterial
-    prop_names = ' diffusivity_Li2O solubility_Li2O '
-    prop_values = ' diffusivity_Li2O_func solubility_Li2O_func '
+    prop_names = ' diffusivity_Fe solubility_Fe '
+    prop_values = ' diffusivity_Fe_func solubility_Fe_func '
     outputs = all
   []
   [converter_to_nonAD]
     type = MaterialADConverter
-    ad_props_in = 'diffusivity_Li2O '
-    reg_props_out = 'diffusivity_Li2O_nonAD '
+    ad_props_in = 'diffusivity_Fe '
+    reg_props_out = 'diffusivity_Fe_nonAD '
   []
 []
 
 [Postprocessors]
   [avg_flux_left]
     type = SideDiffusiveFluxAverage
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     boundary = left
-    diffusivity = diffusivity_Li2O_nonAD
+    diffusivity = diffusivity_Fe_nonAD
   []
   [avg_flux_upper]
     type = SideDiffusiveFluxAverage
-    variable = tritium_concentration_Li2O
+    variable = tritium_concentration_Fe
     boundary = top
-    diffusivity = diffusivity_Li2O_nonAD
+    diffusivity = diffusivity_Fe_nonAD
   []
   [avg_flux_left_upper_sum]
     type = ParsedPostprocessor
@@ -211,13 +211,13 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     variable = temperature
     execute_on = 'initial timestep_end'
   []
-  [diffusion_Li2O]
+  [diffusion_Fe]
     type = ElementAverageValue
-    variable = diffusivity_Li2O
+    variable = diffusivity_Fe
   []
-  [solubility_Li2O]
+  [solubility_Fe]
     type = ElementAverageValue
-    variable = solubility_Li2O
+    variable = solubility_Fe
   []
   [dt]
     type = TimestepSize
