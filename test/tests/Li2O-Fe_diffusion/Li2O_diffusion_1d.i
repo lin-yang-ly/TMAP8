@@ -128,21 +128,29 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
                             ${temperature_initial}-((1-exp(-(t-${charge_time})/${cooldown_time_constant}))*${fparse temperature_initial - temperature_cooldown_min}),
                             ${temperature_desorption_min}+${desorption_heating_rate}*(t-${fparse charge_time + cooldown_duration})))'
   []
+  [diffusivity_Li2O_pre_func]
+    type = ParsedFunction
+    expression = ${diffusion_Li2O_preexponential}
+  []
   [diffusivity_Li2O_func]
     type = ParsedFunction
-    symbol_names = 'T'
-    symbol_values = 'temperature_bc_func'
-    expression = '${diffusion_Li2O_preexponential}*exp(-${diffusion_Li2O_energy}/T)'
+    symbol_names = 'T diffusivity_Li2O_pre_func'
+    symbol_values = 'temperature_bc_func diffusivity_Li2O_pre_func'
+    expression = 'diffusivity_Li2O_pre_func * exp(-${diffusion_Li2O_energy}/T)'
   []
   [enclosure_pressure_func]
     type = ParsedFunction
     expression = 'if(t<${charge_time}, ${pressure_enclosure_init}, if(t<${fparse charge_time + cooldown_duration}, ${pressure_enclosure_cooldown}, ${pressure_enclosure_desorption}))'
   []
+  [solubility_Li2O_pre_func]
+    type = ParsedFunction
+    expression = ${solubility_constant_Li2O}
+  []
   [solubility_Li2O_func]
     type = ParsedFunction
-    symbol_names = 'T'
-    symbol_values = 'temperature_bc_func'
-    expression = '${solubility_constant_Li2O} * exp(-${solubility_energy_Li2O}/T)'
+    symbol_names = 'T solubility_Li2O_pre_func'
+    symbol_values = 'temperature_bc_func solubility_Li2O_pre_func'
+    expression = 'solubility_Li2O_pre_func * exp(-${solubility_energy_Li2O}/T)'
   []
   [max_time_step_size_func]
     type = ParsedFunction
@@ -153,8 +161,8 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
 [Materials]
   [diffusion_solubility]
     type = ADGenericFunctionMaterial
-    prop_names = ' diffusivity_Li2O solubility_Li2O '
-    prop_values = ' diffusivity_Li2O_func solubility_Li2O_func '
+    prop_names = ' diffusivity_Li2O solubility_Li2O solubility_Li2O_pre'
+    prop_values = ' diffusivity_Li2O_func solubility_Li2O_func solubility_Li2O_pre_func'
     outputs = all
   []
   [converter_to_nonAD]

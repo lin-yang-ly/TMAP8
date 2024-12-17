@@ -5,57 +5,51 @@ solubility_constant_Li2O = ${fparse 2.0568216e-05 * 4.04e28 / 1e18 / concentrati
 [StochasticTools]
 []
 
-# [Distributions]
-#   [diffusivity_pre_exponential]
-#     type = Uniform
-#     lower_bound = ${fparse ${diffusion_Li2O_preexponential} * 1e-4}
-#     upper_bound = ${fparse ${diffusion_Li2O_preexponential} * 1e4}
-#   []
-#   [solubility_pre_exponential]
-#     type = Uniform
-#     lower_bound = ${fparse ${solubility_constant_Li2O} * 1e-4}
-#     upper_bound = ${fparse ${solubility_constant_Li2O} * 1e4}
-#   []
-# []
-
 [Samplers]
-  # [hypercube]
-  #   type = LatinHypercube
-  #   num_rows = 5000
-  #   distributions = 'diffusivity_pre_exponential solubility_pre_exponential'
-  # []
-  [cartesian_sampling]
+  [sampler]
     type = CartesianProduct
     # type = Cartesian1D
     linear_space_items = ' ${fparse ${diffusion_Li2O_preexponential} * 1e-4} 1e2 5
                            ${fparse ${solubility_constant_Li2O} * 1e-4}      1e2 5'
     # nominal_values = '${diffusion_Li2O_preexponential} ${solubility_constant_Li2O}'
-    execute_on = 'initial timestep_end'
+    execute_on = 'PRE_MULTIAPP_SETUP'
   []
 []
 
 [MultiApps]
   [runner]
     type = SamplerFullSolveMultiApp
-    sampler = cartesian_sampling
+    sampler = sampler
     input_files = 'Li2O_diffusion_1d.i'
-    mode = batch-restore
   []
 []
 
 [Transfers]
-  [parameters]
-    type = SamplerParameterTransfer
-    to_multi_app = runner
-    sampler = cartesian_sampling
-    parameters = 'diffusion_Li2O_preexponential solubility_constant_Li2O'
-  []
+  # Input
+  # [parameters]
+  #   type = SamplerParameterTransfer
+  #   to_multi_app = runner
+  #   sampler = sampler
+  #   parameters = 'diffusion_Li2O_preexponential solubility_constant_Li2O'
+  # []
+
+  # Output
   [results]
     type = SamplerReporterTransfer
     from_multi_app = runner
-    sampler = cartesian_sampling
+    sampler = sampler
     stochastic_reporter = results
     from_reporter = 'avg_flux_total/value'
+  []
+[]
+
+[Controls]
+  # Input
+  [cmdline]
+    type = MultiAppSamplerControl
+    multi_app = runner
+    sampler = sampler
+    param_names = 'diffusion_Li2O_preexponential solubility_constant_Li2O'
   []
 []
 
