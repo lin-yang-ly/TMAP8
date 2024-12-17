@@ -206,6 +206,12 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
   []
 []
 
+[Controls]
+  [stochastic]
+    type = SamplerReceiver
+  []
+[]
+
 [Preconditioning]
   [SMP]
     type = SMP
