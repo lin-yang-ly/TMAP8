@@ -195,11 +195,11 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     variable = temperature
     execute_on = 'initial timestep_end'
   []
-  [diffusion_Li2O]
+  [diffusivity]
     type = ElementAverageValue
     variable = diffusivity_Li2O
   []
-  [solubility_Li2O]
+  [solubility]
     type = ElementAverageValue
     variable = solubility_Li2O
   []
@@ -238,7 +238,7 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
   end_time = ${endtime}
   automatic_scaling = true
   compute_scaling_once = false
-  nl_max_its = 7
+  nl_max_its = 10
   [TimeStepper]
     type = IterationAdaptiveDT
     dt = ${dt_start_charging}

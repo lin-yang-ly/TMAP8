@@ -1,0 +1,43 @@
+{
+    "app_name": "main",
+    "current_time": "Thu Dec 19 11:36:29 2024",
+    "executable": "/Users/yangl/projects/TMAP8/tmap8-opt",
+    "executable_time": "Tue Dec 17 09:12:06 2024",
+    "libmesh_version": "",
+    "moose_version": "git commit a96456d191 on 2024-12-16",
+    "number_of_parts": 12,
+    "part": 5,
+    "petsc_version": "3.22.1",
+    "reporters": {
+        "results": {
+            "type": "StochasticReporter",
+            "values": {
+                "results:avg_flux_total:value": {
+                    "row_begin": 7,
+                    "row_end": 8,
+                    "type": "std::vector<double>"
+                },
+                "results:converged": {
+                    "row_begin": 7,
+                    "row_end": 8,
+                    "type": "std::vector<bool>"
+                }
+            }
+        }
+    },
+    "slepc_version": "3.22.1",
+    "time_steps": [
+        {
+            "results": {
+                "results:avg_flux_total:value": [
+                    4.716974167792243
+                ],
+                "results:converged": [
+                    true
+                ]
+            },
+            "time": 2.0,
+            "time_step": 2
+        }
+    ]
+}

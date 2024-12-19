@@ -211,11 +211,11 @@ node_length_Li2O = ${fparse length_Li2O_modeled / num_nodes_Li2O}
     variable = temperature
     execute_on = 'initial timestep_end'
   []
-  [diffusion_Li2O]
+  [diffusivity]
     type = ElementAverageValue
     variable = diffusivity_Li2O
   []
-  [solubility_Li2O]
+  [solubility]
     type = ElementAverageValue
     variable = solubility_Li2O
   []

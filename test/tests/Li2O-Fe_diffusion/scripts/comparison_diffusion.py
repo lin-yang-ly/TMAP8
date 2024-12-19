@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import gridspec
 import pandas as pd
-from scipy import special
 import os
 
 # Changes working directory to script directory (for consistent MooseDocs usage)
@@ -44,56 +43,51 @@ def numerical_solution_on_experiment_input(experiment_input, tmap_input, tmap_ou
         new_tmap_output[i] = (experiment_input[i] - tmap_input[left_limit]) / (tmap_input[right_limit] - tmap_input[left_limit]) * (tmap_output[right_limit] - tmap_output[left_limit]) + tmap_output[left_limit]
     return new_tmap_output
 
+def read_csv_from_TMAP8(file_name, parameter_names):
+    """Read simulation data in csv files from TMAP8
+
+    Args:
+        file_name (string): the file name at simulation folder
+        parameter_names (list): the list of parameters extracted from csv files
+
+    Returns:
+        float, ndarray: the matrix keep the simulation results, first axis depended on len(parameter_names)
+    """
+    if "/TMAP8/doc/" in script_folder:     # if in documentation folder
+        csv_folder = f"../../../../test/tests/Li2O-Fe_diffusion/gold/{file_name}"
+    else:                                  # if in test folder
+        csv_folder = f"../gold/{file_name}"
+    simulation_data = pd.read_csv(csv_folder)
+    simulation_results = []
+    for i in range(len(parameter_names)):
+        simulation_results.append(simulation_data[parameter_names[i]])
+    simulation_results = np.array(simulation_results)
+    return simulation_results
+
 ################################################################################
 ################################# 1D DIFFUSION #################################
 ################################################################################
 
 #===============================================================================
 # Extract Fe and Li2O predictions in 1D model
-
-if "/TMAP8/doc/" in script_folder:     # if in documentation folder
-    csv_folder_Fe = "../../../../test/tests/val-2b/gold/Fe_diffusion_1d_out.csv"
-    csv_folder_Li2O = "../../../../test/tests/val-2b/gold/Li2O_diffusion_1d_out.csv"
-else:                                  # if in test folder
-    csv_folder_Fe = "../gold/Fe_diffusion_1d_out.csv"
-    csv_folder_Li2O = "../gold/Li2O_diffusion_1d_out.csv"
-
-tmap_solution_Fe = pd.read_csv(csv_folder_Fe)
-tmap_time_Fe = tmap_solution_Fe['time'] # s
-tmap_temperature_Fe = tmap_solution_Fe['temperature'] # K
-tmap_pressure_Fe = tmap_solution_Fe['enclosure_pressure'] # Pa
-tmap_flux_Fe = tmap_solution_Fe['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
-
-tmap_solution_Li2O = pd.read_csv(csv_folder_Li2O)
-tmap_time_Li2O = tmap_solution_Li2O['time'] # s
-tmap_temperature_Li2O = tmap_solution_Li2O['temperature'] # K
-tmap_pressure_Li2O = tmap_solution_Li2O['enclosure_pressure'] # Pa
-tmap_flux_Li2O = tmap_solution_Li2O['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
+parameter_names = ['time','temperature','enclosure_pressure','avg_flux_total'] # s, K, Pa, atoms/microns^2/s
+file_name = 'Fe_diffusion_1d_out.csv'
+simulation_results_Fe = read_csv_from_TMAP8(file_name, parameter_names) # read csv file
+simulation_results_Fe[parameter_names.index('avg_flux_total')] = simulation_results_Fe[parameter_names.index('avg_flux_total')] * 1e12 # atoms/microns^2/s -> atoms/m^2/s
+file_name = 'Li2O_diffusion_1d_out.csv'
+simulation_results_Li2O = read_csv_from_TMAP8(file_name, parameter_names) # read csv file
+simulation_results_Li2O[parameter_names.index('avg_flux_total')] = simulation_results_Li2O[parameter_names.index('avg_flux_total')] * 1e12 # atoms/microns^2/s -> atoms/m^2/s
 
 # select only the simulation data for desorption
-tmap_time_desorption_Fe = []
-tmap_temperature_desorption_Fe = []
-tmap_flux_desorption_Fe = []
-for i in range(len(tmap_time_Fe)):
-    if tmap_time_Fe[i]>=start_time_desorption:
-        tmap_time_desorption_Fe.append(tmap_time_Fe[i])
-        tmap_temperature_desorption_Fe.append(tmap_temperature_Fe[i])
-        tmap_flux_desorption_Fe.append(tmap_flux_Fe[i])
-tmap_time_desorption_Fe = np.array(tmap_time_desorption_Fe)
-tmap_temperature_desorption_Fe = np.array(tmap_temperature_desorption_Fe)
-tmap_flux_desorption_Fe = np.array(tmap_flux_desorption_Fe)
+chosen_matrix = simulation_results_Fe[parameter_names.index('time')]>=start_time_desorption
+tmap_time_desorption_Fe = simulation_results_Fe[parameter_names.index('time')][chosen_matrix]
+tmap_temperature_desorption_Fe = simulation_results_Fe[parameter_names.index('temperature')][chosen_matrix]
+tmap_flux_desorption_Fe = simulation_results_Fe[parameter_names.index('avg_flux_total')][chosen_matrix]
 
-tmap_time_desorption_Li2O = []
-tmap_temperature_desorption_Li2O = []
-tmap_flux_desorption_Li2O = []
-for i in range(len(tmap_time_Li2O)):
-    if tmap_time_Li2O[i]>=start_time_desorption:
-        tmap_time_desorption_Li2O.append(tmap_time_Li2O[i])
-        tmap_temperature_desorption_Li2O.append(tmap_temperature_Li2O[i])
-        tmap_flux_desorption_Li2O.append(tmap_flux_Li2O[i])
-tmap_time_desorption_Li2O = np.array(tmap_time_desorption_Li2O)
-tmap_temperature_desorption_Li2O = np.array(tmap_temperature_desorption_Li2O)
-tmap_flux_desorption_Li2O = np.array(tmap_flux_desorption_Li2O)
+chosen_matrix = simulation_results_Li2O[parameter_names.index('time')]>=start_time_desorption
+tmap_time_desorption_Li2O = simulation_results_Li2O[parameter_names.index('time')][chosen_matrix]
+tmap_temperature_desorption_Li2O = simulation_results_Li2O[parameter_names.index('temperature')][chosen_matrix]
+tmap_flux_desorption_Li2O = simulation_results_Li2O[parameter_names.index('avg_flux_total')][chosen_matrix]
 
 #===============================================================================
 # Extract experimental data
@@ -114,8 +108,10 @@ gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
 ax2 = ax.twinx()
 
-ax2.plot(tmap_time_Fe/60/60, tmap_pressure_Fe, label=r"Pressure", c='r')
-ax.plot(tmap_time_Fe/60/60, tmap_temperature_Fe, label=r"Temperature", c='b',ls='--')
+ax2.plot(simulation_results_Fe[parameter_names.index('time')]/3600,
+            simulation_results_Fe[parameter_names.index('enclosure_pressure')], label=r"Pressure", c='r')
+ax.plot(simulation_results_Fe[parameter_names.index('time')]/3600,
+            simulation_results_Fe[parameter_names.index('temperature')], label=r"Temperature", c='b',ls='--')
 
 ax.set_xlabel(u'Time (h)')
 ax.set_ylabel(u"Temperature (K)", c='b')
@@ -161,49 +157,23 @@ plt.close(fig)
 # ============================================================================ #
 # Extract Fe and Li2O predictions in 2D model
 
-if "/TMAP8/doc/" in script_folder:     # if in documentation folder
-    csv_folder_Fe = "../../../../test/tests/val-2b/gold/Fe_diffusion_2d_out.csv"
-    csv_folder_Li2O = "../../../../test/tests/val-2b/gold/Li2O_diffusion_2d_out.csv"
-else:                                  # if in test folder
-    csv_folder_Fe = "../gold/Fe_diffusion_2d_out.csv"
-    csv_folder_Li2O = "../gold/Li2O_diffusion_2d_out.csv"
-
-tmap_solution_Fe = pd.read_csv(csv_folder_Fe)
-tmap_time_Fe = tmap_solution_Fe['time'] # s
-tmap_temperature_Fe = tmap_solution_Fe['temperature'] # K
-tmap_pressure_Fe = tmap_solution_Fe['enclosure_pressure'] # Pa
-tmap_flux_Fe = tmap_solution_Fe['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
-
-tmap_solution_Li2O = pd.read_csv(csv_folder_Li2O)
-tmap_time_Li2O = tmap_solution_Li2O['time'] # s
-tmap_temperature_Li2O = tmap_solution_Li2O['temperature'] # K
-tmap_pressure_Li2O = tmap_solution_Li2O['enclosure_pressure'] # Pa
-tmap_flux_Li2O = tmap_solution_Li2O['avg_flux_total']*1e12 # atoms/microns^2/s -> atoms/m^2/s
+file_name = 'Fe_diffusion_2d_out.csv'
+simulation_results_Fe = read_csv_from_TMAP8(file_name, parameter_names) # read csv file
+simulation_results_Fe[parameter_names.index('avg_flux_total')] = simulation_results_Fe[parameter_names.index('avg_flux_total')] * 1e12 # atoms/microns^2/s -> atoms/m^2/s
+file_name = 'Li2O_diffusion_2d_out.csv'
+simulation_results_Li2O = read_csv_from_TMAP8(file_name, parameter_names) # read csv file
+simulation_results_Li2O[parameter_names.index('avg_flux_total')] = simulation_results_Li2O[parameter_names.index('avg_flux_total')] * 1e12 # atoms/microns^2/s -> atoms/m^2/s
 
 # select only the simulation data for desorption
-tmap_time_desorption_Fe = []
-tmap_temperature_desorption_Fe = []
-tmap_flux_desorption_Fe = []
-for i in range(len(tmap_time_Fe)):
-    if tmap_time_Fe[i]>=start_time_desorption:
-        tmap_time_desorption_Fe.append(tmap_time_Fe[i])
-        tmap_temperature_desorption_Fe.append(tmap_temperature_Fe[i])
-        tmap_flux_desorption_Fe.append(tmap_flux_Fe[i])
-tmap_time_desorption_Fe = np.array(tmap_time_desorption_Fe)
-tmap_temperature_desorption_Fe = np.array(tmap_temperature_desorption_Fe)
-tmap_flux_desorption_Fe = np.array(tmap_flux_desorption_Fe)
+chosen_matrix = simulation_results_Fe[parameter_names.index('time')]>=start_time_desorption
+tmap_time_desorption_Fe = simulation_results_Fe[parameter_names.index('time')][chosen_matrix]
+tmap_temperature_desorption_Fe = simulation_results_Fe[parameter_names.index('temperature')][chosen_matrix]
+tmap_flux_desorption_Fe = simulation_results_Fe[parameter_names.index('avg_flux_total')][chosen_matrix]
 
-tmap_time_desorption_Li2O = []
-tmap_temperature_desorption_Li2O = []
-tmap_flux_desorption_Li2O = []
-for i in range(len(tmap_time_Li2O)):
-    if tmap_time_Li2O[i]>=start_time_desorption:
-        tmap_time_desorption_Li2O.append(tmap_time_Li2O[i])
-        tmap_temperature_desorption_Li2O.append(tmap_temperature_Li2O[i])
-        tmap_flux_desorption_Li2O.append(tmap_flux_Li2O[i])
-tmap_time_desorption_Li2O = np.array(tmap_time_desorption_Li2O)
-tmap_temperature_desorption_Li2O = np.array(tmap_temperature_desorption_Li2O)
-tmap_flux_desorption_Li2O = np.array(tmap_flux_desorption_Li2O)
+chosen_matrix = simulation_results_Li2O[parameter_names.index('time')]>=start_time_desorption
+tmap_time_desorption_Li2O = simulation_results_Li2O[parameter_names.index('time')][chosen_matrix]
+tmap_temperature_desorption_Li2O = simulation_results_Li2O[parameter_names.index('temperature')][chosen_matrix]
+tmap_flux_desorption_Li2O = simulation_results_Li2O[parameter_names.index('avg_flux_total')][chosen_matrix]
 
 # ============================================================================ #
 # Plot comparison between TMAP8 predictions and experimental data

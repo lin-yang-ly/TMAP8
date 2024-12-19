@@ -211,11 +211,11 @@ node_length_Fe = ${fparse length_Fe_modeled / num_nodes_Fe}
     variable = temperature
     execute_on = 'initial timestep_end'
   []
-  [diffusion_Fe]
+  [diffusivity]
     type = ElementAverageValue
     variable = diffusivity_Fe
   []
-  [solubility_Fe]
+  [solubility]
     type = ElementAverageValue
     variable = solubility_Fe
   []
