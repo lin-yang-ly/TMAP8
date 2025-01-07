@@ -35,18 +35,18 @@
 width = 60
 input_file_name = 'EBSD_files/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.txt'
 output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
+bound_value_upper_limit = 1.01
 
 [Mesh]
   [ebsd_mesh]
     type = EBSDMeshGenerator
     filename = ${input_file_name}
-    # uniform_refine = 3
   []
 []
 
 [GlobalParams]
   # Parameters used by several kernels that are defined globally to simplify input file
-  op_num = 12 # Number of grains
+  op_num = 8 # Number of grains
   var_name_base = gr # Base name of grains
 []
 
@@ -63,13 +63,75 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
   []
   [grain_tracker]
     type = GrainTracker
-    threshold = 0.001
-    connecting_threshold = 0.008
+    threshold = 0.3
     compute_var_to_feature_map = true
     compute_halo_maps = true # For displaying HALO fields
     remap_grains = true
     polycrystal_ic_uo = ebsd
     execute_on = 'initial timestep_end'
+  []
+  # [./term]
+  #   type = Terminator
+  #   expression = 'GB_area_max < 0'
+  # [../]
+[]
+
+[Bounds]
+  [gr0_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr0
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr1_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr1
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr2_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr2
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr3_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr3
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr4_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr4
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr5_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr5
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr6_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr6
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
+  []
+  [gr7_upper_bound]
+    type = ConstantBounds
+    variable = bounds_dummy
+    bounded_variable = gr7
+    bound_type = upper
+    bound_value = ${bound_value_upper_limit}
   []
 []
 
@@ -117,19 +179,51 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
     order = CONSTANT
     family = MONOMIAL
   []
-  # [./EBSD_grain]
-  #   family = MONOMIAL
-  #   order = CONSTANT
-  # [../]
   [ebsd_numbers]
     order = CONSTANT
     family = MONOMIAL
   []
-  # [./EBSD_grain_poss_id]
-  #   family = MONOMIAL
-  #   order = CONSTANT
-  # [../]
+  [phase_numbers]
+    order = CONSTANT
+    family = MONOMIAL
+  []
   [ghost_regions]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halos]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo0]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo1]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo2]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo3]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo4]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo5]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo6]
+    order = CONSTANT
+    family = MONOMIAL
+  []
+  [halo7]
     order = CONSTANT
     family = MONOMIAL
   []
@@ -140,6 +234,10 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
   [pid]
     family = MONOMIAL
     order = CONSTANT
+  []
+  [bounds_dummy]
+    order = FIRST
+    family = LAGRANGE
   []
 []
 
@@ -212,15 +310,6 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
     execute_on = 'INITIAL TIMESTEP_END'
   []
 
-  # Import the unique grain ID from ebsd data
-  # [./grain_aux]
-  #   # output the unique id from ebsd data for each grain
-  #   type = EBSDReaderPointDataAux
-  #   variable = EBSD_grain
-  #   ebsd_reader = ebsd_reader
-  #   data_name = 'feature_id'
-  #   execute_on = 'initial TIMESTEP_END'
-  # [../]
   # Import the unique grain ID from ebsd data, and the data structure
   # will change with the guide from grain_tracker
   [ebsd_numbers]
@@ -231,12 +320,83 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
     variable = ebsd_numbers
     execute_on = 'initial timestep_end'
   []
+  [phase_numbers]
+    type = EBSDReaderAvgDataAux
+    data_name = phase
+    ebsd_reader = ebsd_reader
+    grain_tracker = grain_tracker
+    variable = phase_numbers
+    execute_on = 'initial timestep_end'
+  []
   [ghosted_entities]
     type = FeatureFloodCountAux
     variable = ghost_regions
     flood_counter = grain_tracker
     field_display = GHOSTED_ENTITIES
     execute_on = 'initial timestep_end'
+  []
+  [halos]
+    type = FeatureFloodCountAux
+    variable = halos
+    flood_counter = grain_tracker
+    field_display = HALOS
+    execute_on = 'initial timestep_end'
+  []
+  [halo0]
+    type = FeatureFloodCountAux
+    variable = halo0
+    map_index = 0
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo1]
+    type = FeatureFloodCountAux
+    variable = halo1
+    map_index = 1
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo2]
+    type = FeatureFloodCountAux
+    variable = halo2
+    map_index = 2
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo3]
+    type = FeatureFloodCountAux
+    variable = halo3
+    map_index = 3
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo4]
+    type = FeatureFloodCountAux
+    variable = halo4
+    map_index = 4
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo5]
+    type = FeatureFloodCountAux
+    variable = halo5
+    map_index = 5
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo6]
+    type = FeatureFloodCountAux
+    variable = halo6
+    map_index = 6
+    field_display = HALOS
+    flood_counter = grain_tracker
+  []
+  [halo7]
+    type = FeatureFloodCountAux
+    variable = halo7
+    map_index = 7
+    field_display = HALOS
+    flood_counter = grain_tracker
   []
   [active_bounds_elemental]
     type = FeatureFloodCountAux
@@ -289,6 +449,13 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
     output_properties = 'gb_type'
     outputs = exodus
   []
+  [GB_matrix]
+    type = ADParsedMaterial
+    property_name = GB_matrix
+    coupled_variables = 'bnds'
+    expression = 'if(bnds < 0.9, 1, 0)'
+    outputs = exodus
+  []
 []
 
 [Postprocessors]
@@ -307,6 +474,15 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
   []
   [DOFs]
     type = NumDOFs
+  []
+  [gb_area]
+    type = ADElementIntegralMaterialProperty
+    mat_prop = 'GB_matrix'
+    execute_on = 'initial timestep_end'
+  []
+  [Surface_tot]
+    type = ElementIntegralMaterialProperty
+    mat_prop = 1
   []
 []
 
@@ -355,8 +531,8 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
   solve_type = 'NEWTON'
 
   petsc_options = '-snes_ksp_ew'
-  petsc_options_iname = '-pc_type'
-  petsc_options_value = 'lu'
+  petsc_options_iname = '-pc_type -snes_type'
+  petsc_options_value = 'lu vinewtonrsls'
 
   l_max_its = 30 # Max number of linear iterations
   l_tol = 1e-4 # Relative tolerance for linear solves
@@ -386,6 +562,6 @@ output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
   []
   [exodus]
     type = Exodus
-    execute_on = 'INITIAL FINAL'
+    execute_on = 'INITIAL timestep_end'
   []
 []

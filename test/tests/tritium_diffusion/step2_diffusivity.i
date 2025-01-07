@@ -27,8 +27,8 @@
 R = '${units 8.31446261815324 J/mol/K}' # ideal gas constant based on number used in include/utils/PhysicalConstants.h
 T = '${units 1000 K}'
 
-diffusivity_prefactor_Fe = '${units ${fparse exp(-5.93) * 1e-4} m^2/s -> nm^2/s}' # Tritium
-diffusivity_energy_Fe = '${units ${fparse 81.73 * 1e3} J/mol}'
+diffusivity_prefactor_Fe = '${units 1.9e-6 m^2/s -> nm^2/s}' # Tritium
+diffusivity_energy_Fe = '${units 61300 J/mol}'
 diffusivity_prefactor_Li2O = '${units ${fparse exp(-5.93) * 1e-4} m^2/s -> nm^2/s}' # Tritium
 diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
 
@@ -39,7 +39,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
 []
 
 [GlobalParams]
-  op_num = 12
+  op_num = 8
   var_name_base = gr
 []
 
@@ -48,14 +48,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     type = SolutionUserObject
     mesh = ${file_name}
     timestep = LATEST
-  []
-  [grain_tracker]
-    type = GrainTracker
-    threshold = 0.3
-    connecting_threshold = 0.08
-    compute_var_to_feature_map = true
-    execute_on = 'INITIAL'
-    remap_grains = false
   []
 []
 
@@ -82,6 +74,18 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   #   order = FIRST
   #   family = LAGRANGE
   # []
+  [phase_numbers]
+    order = FIRST
+    family = LAGRANGE
+  []
+  [phase_Fe]
+    order = FIRST
+    family = LAGRANGE
+  []
+  [phase_Li2O]
+    order = FIRST
+    family = LAGRANGE
+  []
   [gr0]
     order = FIRST
     family = LAGRANGE
@@ -114,25 +118,34 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     order = FIRST
     family = LAGRANGE
   []
-  [gr8]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr9]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr10]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr11]
-    order = FIRST
-    family = LAGRANGE
-  []
 []
 
 [AuxKernels]
+  [phase_numbers]
+    type = SolutionAux
+    execute_on = INITIAL
+    variable = phase_numbers
+    solution = initial_grains
+    from_variable = phase_numbers
+  []
+  [phase_Fe]
+    # Calculate the bnds for specific GB type
+    type = SolutionAuxMisorientationBoundary
+    variable = phase_Fe
+    gb_type_order = 1
+    solution = initial_grains
+    from_variable = phase_numbers
+    execute_on = 'INITIAL TIMESTEP_END'
+  []
+  [phase_Li2O]
+    # Calculate the bnds for specific GB type
+    type = SolutionAuxMisorientationBoundary
+    variable = phase_Li2O
+    gb_type_order = 2
+    solution = initial_grains
+    from_variable = phase_numbers
+    execute_on = 'INITIAL TIMESTEP_END'
+  []
   [init_grO]
     type = SolutionAux
     execute_on = INITIAL
@@ -189,56 +202,28 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     solution = initial_grains
     from_variable = gr7
   []
-  [init_gr8]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr8
-    solution = initial_grains
-    from_variable = gr8
-  []
-  [init_gr9]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr9
-    solution = initial_grains
-    from_variable = gr9
-  []
-  [init_gr10]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr10
-    solution = initial_grains
-    from_variable = gr10
-  []
-  [init_gr11]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr11
-    solution = initial_grains
-    from_variable = gr11
-  []
 []
 
 [Kernels]
   [Diff_x]
     type = MatDiffusion
-    diffusivity = diffusivity_Fe
+    diffusivity = diffusivity_in_phase
     variable = cx_AEH
   []
   [Diff_x_AEH]
     type = HomogenizedHeatConduction
-    diffusion_coefficient = diffusivity_Fe
+    diffusion_coefficient = diffusivity_in_phase
     variable = cx_AEH
     component = 0
   []
   [Diff_y]
     type = MatDiffusion
-    diffusivity = diffusivity_Fe
+    diffusivity = diffusivity_in_phase
     variable = cy_AEH
   []
   [Diff_y_AEH]
     type = HomogenizedHeatConduction
-    diffusion_coefficient = diffusivity_Fe
+    diffusion_coefficient = diffusivity_in_phase
     variable = cy_AEH
     component = 1
   []
@@ -261,6 +246,20 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     constant_expressions = '${diffusivity_prefactor_Li2O}     ${diffusivity_energy_Li2O}'
     function = 'D0 * exp(-Ea / ${R} / ${T})'
   []
+  [Diffusion_in_phase]
+    type = ParsedMaterial
+    f_name = 'diffusivity_in_phase'
+    args = 'phase_numbers'
+    material_property_names = 'diffusivity_Fe diffusivity_Li2O'
+    function = '(2 - phase_numbers) * diffusivity_Fe + (phase_numbers - 1) * diffusivity_Li2O'
+  []
+  # [Diffusion_in_phase]
+  #   type = ParsedMaterial
+  #   f_name = 'diffusivity_in_phase'
+  #   material_property_names = 'diffusivity_Fe diffusivity_Li2O'
+  #   function = 'diffusivity_Li2O'
+  #   outputs = exodus
+  # []
 []
 
 [Postprocessors]
@@ -269,7 +268,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     chi = 'cx_AEH cy_AEH'
     col = 0
     row = 0
-    diffusion_coefficient = diffusivity_Fe
+    diffusion_coefficient = diffusivity_in_phase
     # execute_on = INITIAL
   []
   [D_y_AEH] #Effective thermal conductivity in x-direction from AEH
@@ -277,12 +276,16 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     chi = 'cx_AEH cy_AEH'
     col = 1
     row = 1
-    diffusion_coefficient = diffusivity_Fe
+    diffusion_coefficient = diffusivity_in_phase
     # execute_on = INITIAL
   []
-  [diffusivity_Fe]
+  [diffusivity_Fe_theory]
     type = ElementAverageMaterialProperty
     mat_prop = diffusivity_Fe
+  []
+  [diffusivity_Li2O_theory]
+    type = ElementAverageMaterialProperty
+    mat_prop = diffusivity_Li2O
   []
   [Surface_tot]
     type = ElementIntegralMaterialProperty
