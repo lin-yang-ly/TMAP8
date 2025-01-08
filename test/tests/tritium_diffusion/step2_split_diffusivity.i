@@ -29,8 +29,12 @@ T = '${units 1000 K}'
 
 diffusivity_prefactor_Fe = '${units 1.9e-6 m^2/s -> nm^2/s}' # Tritium
 diffusivity_energy_Fe = '${units 61300 J/mol}'
+solubility_prefactor_Fe = '${units ${fparse 1.87e-6 / 3.016 * 55.845 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
+solubility_energy_Fe = '${units 8240 J/mol}'
 diffusivity_prefactor_Li2O = '${units ${fparse exp(-5.93) * 1e-4} m^2/s -> nm^2/s}' # Tritium
 diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
+solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
+solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 
 file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
 
@@ -246,21 +250,58 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     constant_expressions = '${diffusivity_prefactor_Li2O}     ${diffusivity_energy_Li2O}'
     function = 'D0 * exp(-Ea / ${R} / ${T})'
   []
-  [Diffusion_in_phase]
-    type = ParsedMaterial
-    f_name = 'diffusivity_in_phase'
-    args = 'phase_numbers'
-    material_property_names = 'diffusivity_Fe diffusivity_Li2O'
-    function = '(2 - phase_numbers) * diffusivity_Fe + (phase_numbers - 1) * diffusivity_Li2O'
-    outputs = 'exodus'
-  []
   # [Diffusion_in_phase]
   #   type = ParsedMaterial
   #   f_name = 'diffusivity_in_phase'
+  #   args = 'phase_numbers'
   #   material_property_names = 'diffusivity_Fe diffusivity_Li2O'
-  #   function = 'diffusivity_Li2O'
-  #   outputs = exodus
+  #   function = '(2 - phase_numbers) * diffusivity_Fe + (phase_numbers - 1) * diffusivity_Li2O'
+  #   outputs = 'exodus'
   # []
+  [Diffusion_in_phase]
+    type = ParsedMaterial
+    f_name = 'diffusivity_in_phase'
+    material_property_names = 'diffusivity_Fe diffusivity_Li2O'
+    function = 'diffusivity_Fe'
+    outputs = exodus
+  []
+  [Diffusion_coefficient_solubility_Fe] # bulk diffusivity contribution
+    type = ParsedMaterial
+    property_name = 'solubility_Fe'
+    constant_names = 'K0                              Es'
+    constant_expressions = '${solubility_prefactor_Fe}     ${solubility_energy_Fe}'
+    expression = 'K0 * exp(-Es / ${R} / ${T})'
+  []
+  [Diffusion_coefficient_solubility_Li2O] # bulk diffusivity contribution
+    type = ParsedMaterial
+    property_name = 'solubility_Li2O'
+    constant_names = 'K0                              Es'
+    constant_expressions = '${solubility_prefactor_Li2O}     ${solubility_energy_Li2O}'
+    expression = 'K0 * exp(-Es / ${R} / ${T})'
+  []
+  # [Solubility_in_phase]
+  #   type = ParsedMaterial
+  #   property_name = 'solubility_in_phase'
+  #   coupled_variables = 'phase_numbers'
+  #   material_property_names = 'solubility_Fe solubility_Li2O'
+  #   expression = '(2 - phase_numbers) * solubility_Fe + (phase_numbers - 1) * solubility_Li2O'
+  #   # outputs = 'exodus'
+  # []
+  [Solubility_in_phase]
+    type = ParsedMaterial
+    property_name = 'solubility_in_phase'
+    coupled_variables = 'phase_numbers'
+    material_property_names = 'solubility_Fe solubility_Li2O'
+    expression = 'solubility_Fe'
+    # outputs = 'exodus'
+  []
+  [Concentration_in_BC]
+    type = ParsedMaterial
+    property_name = 'concentration_in_BC'
+    material_property_names = 'solubility_in_phase'
+    expression = 'solubility_in_phase * 1e5 ^ 0.5'
+    outputs = 'exodus'
+  []
 []
 
 [Postprocessors]
@@ -280,6 +321,39 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     diffusion_coefficient = diffusivity_in_phase
     # execute_on = INITIAL
   []
+  [effective_solubility_left]
+    type = SideAverageMaterialProperty
+    property = solubility_in_phase
+    boundary = left
+  []
+  [effective_solubility_right]
+    type = SideAverageMaterialProperty
+    property = solubility_in_phase
+    boundary = right
+  []
+  [effective_solubility_top]
+    type = SideAverageMaterialProperty
+    property = solubility_in_phase
+    boundary = top
+  []
+  [effective_solubility_bottom]
+    type = SideAverageMaterialProperty
+    property = solubility_in_phase
+    boundary = bottom
+  []
+
+  [solubility_Fe_theory]
+    type = ElementAverageMaterialProperty
+    mat_prop = solubility_Fe
+  []
+  [solubility_Li2O_theory]
+    type = ElementAverageMaterialProperty
+    mat_prop = solubility_Li2O
+  []
+  [concentration_bc_test]
+    type = ElementAverageMaterialProperty
+    mat_prop = concentration_in_BC
+  []
   [diffusivity_Fe_theory]
     type = ElementAverageMaterialProperty
     mat_prop = diffusivity_Fe
@@ -287,10 +361,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   [diffusivity_Li2O_theory]
     type = ElementAverageMaterialProperty
     mat_prop = diffusivity_Li2O
-  []
-  [Surface_tot]
-    type = ElementIntegralMaterialProperty
-    mat_prop = 1
   []
 []
 
@@ -327,5 +397,5 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'AEH_Diffusion_Polycrystal_Tritium_output'
+  file_base = 'AEH_Diffusion_Polycrystal_Tritium_Fe_output'
 []
