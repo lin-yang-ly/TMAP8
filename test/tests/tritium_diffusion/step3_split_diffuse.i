@@ -39,8 +39,8 @@ solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 solubility_order = 0.5
 
 # Modeling data from step 2
-# diffusivity_Fe_step2 = '${units 1.17e9 at/nm^3/Pa}'
-diffusivity_Li2O_step2 = '${units 1.40e7 at/nm^3/Pa}'
+diffusivity_Fe_step2 = '${units 1.17e9 at/nm^3/Pa}'
+# diffusivity_Li2O_step2 = '${units 1.40e7 at/nm^3/Pa}'
 file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
 
 [Mesh]
@@ -86,7 +86,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   [Diff_c]
     type = MatDiffusion
     variable = concentration
-    diffusivity = ${diffusivity_Li2O_step2}
+    diffusivity = ${diffusivity_Fe_step2}
   []
 []
 
@@ -170,7 +170,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   []
   [point_value]
     type = PointValue
-    point = "-400 -400 0"
+    point = "-10 -10 0"
     variable = concentration
   []
 []
@@ -207,5 +207,5 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'M1_Split_Tritium_Li2O_output'
+  file_base = 'M1_Split_Tritium_Fe_output'
 []

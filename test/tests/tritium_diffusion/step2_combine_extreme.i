@@ -82,15 +82,15 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   [Diff_c]
     type = MatDiffusion
     variable = concentration
-    diffusivity = diffusivity_Fe
+    diffusivity = diffusivity_Li2O
   []
 []
 
 [BCs]
   [left_flux]
     type = EquilibriumBC
-    Ko = ${solubility_prefactor_Fe}
-    activation_energy = '${solubility_energy_Fe}'
+    Ko = ${solubility_prefactor_Li2O}
+    activation_energy = '${solubility_energy_Li2O}'
     boundary = 'left right top bottom'
     enclosure_var = ${P}
     temperature = ${T}
@@ -172,7 +172,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   []
   [point_value]
     type = PointValue
-    point = "-400 -400 0"
+    point = "-10 -10 0"
     variable = concentration
   []
 []
@@ -209,5 +209,5 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'M2_Combine_Tritium_Fe_output'
+  file_base = 'M2_Combine_Tritium_Li2O_output'
 []

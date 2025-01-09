@@ -43,11 +43,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   file = ${file_name}
 []
 
-[GlobalParams]
-  op_num = 8
-  var_name_base = gr
-[]
-
 [UserObjects]
   [initial_grains]
     type = SolutionUserObject
@@ -86,46 +81,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     order = FIRST
     family = LAGRANGE
   []
-  [phase_Fe]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [phase_Li2O]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr0]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr1]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr2]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr3]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr4]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr5]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr6]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr7]
-    order = FIRST
-    family = LAGRANGE
-  []
 []
 
 [AuxKernels]
@@ -135,80 +90,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     variable = phase_numbers
     solution = initial_grains
     from_variable = phase_numbers
-  []
-  [phase_Fe]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Fe
-    gb_type_order = 1
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
-  []
-  [phase_Li2O]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Li2O
-    gb_type_order = 2
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
-  []
-  [init_grO]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr0
-    solution = initial_grains
-    from_variable = gr0
-  []
-  [init_gr1]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr1
-    solution = initial_grains
-    from_variable = gr1
-  []
-  [init_gr2]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr2
-    solution = initial_grains
-    from_variable = gr2
-  []
-  [init_gr3]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr3
-    solution = initial_grains
-    from_variable = gr3
-  []
-  [init_gr4]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr4
-    solution = initial_grains
-    from_variable = gr4
-  []
-  [init_gr5]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr5
-    solution = initial_grains
-    from_variable = gr5
-  []
-  [init_gr6]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr6
-    solution = initial_grains
-    from_variable = gr6
-  []
-  [init_gr7]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr7
-    solution = initial_grains
-    from_variable = gr7
   []
 []
 
