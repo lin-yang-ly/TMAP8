@@ -104,18 +104,19 @@ gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
 
 label_list_Li2O = [""] * num_files
-label_list_Li2O[0] = "Li2O"
-label_list_Li2O[int(num_files/2)] = "Li2O"
+for i in range(int(num_files/2)): label_list_Li2O[i] = r"Li$_2$O - D $\times$ 10$^{" + f"{int(i - 3)}" + r"}$"
+for i in range(int(num_files/2), num_files): label_list_Li2O[i] = r"Li$_2$O - D $\times$ 10$^{" + f"{int(i - 3 - num_files/2)}" + r"}$"
 label_list_Fe = [""] * num_files
-label_list_Fe[0] = "Fe"
-label_list_Fe[int(num_files/2)] = "Fe"
+for i in range(int(num_files/2)): label_list_Fe[i] = r"Fe - D $\times$ 10$^{" + f"{int(i - 3)}" + r"}$"
+for i in range(int(num_files/2), num_files): label_list_Fe[i] = r"Fe - D $\times$ 10$^{" + f"{int(i - 3 - num_files/2)}" + r"}$"
 for i in range(int(num_files/2)):
     ax.plot(simulation_results_Fe[i][parameter_names.index('temperature')], simulation_results_Fe[i][parameter_names.index('avg_flux_total')], label=label_list_Fe[i], c='tab:blue', alpha = 1/1.5**i)
+for i in range(int(num_files/2)):
     ax.plot(simulation_results_Li2O[i][parameter_names.index('temperature')], simulation_results_Li2O[i][parameter_names.index('avg_flux_total')], label=label_list_Li2O[i], c='tab:orange', alpha = 1/1.5**i)
 
 ax.set_xlabel(u'Temperature (K)')
 ax.set_ylabel(u"Tritium flux (atom/m$^2$/s)")
-ax.legend(loc="best")
+ax.legend(loc=(1.01,0.05),ncols=1)
 ax.set_ylim(bottom=1e10,top=1e21)
 ax.set_yscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
@@ -130,11 +131,12 @@ ax = fig.add_subplot(gs[0])
 
 for i in range(int(num_files/2),num_files):
     ax.plot(simulation_results_Fe[i][parameter_names.index('temperature')], simulation_results_Fe[i][parameter_names.index('avg_flux_total')], label=label_list_Fe[i], c='tab:blue', alpha = 1/1.5**(i-int(num_files/2)))
+for i in range(int(num_files/2),num_files):
     ax.plot(simulation_results_Li2O[i][parameter_names.index('temperature')], simulation_results_Li2O[i][parameter_names.index('avg_flux_total')], label=label_list_Li2O[i], c='tab:orange', alpha = 1/1.5**(i-int(num_files/2)))
 
 ax.set_xlabel(u'Temperature (K)')
 ax.set_ylabel(u"Tritium flux (atom/m$^2$/s)")
-ax.legend(loc="best")
+ax.legend(loc=(1.01,0.05),ncols=1)
 ax.set_ylim(bottom=1e10,top=1e21)
 ax.set_yscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
@@ -218,18 +220,19 @@ gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
 
 label_list_Li2O = [""] * num_files
-label_list_Li2O[0] = "Li2O"
-label_list_Li2O[int(num_files/2)] = "Li2O"
+for i in range(int(num_files/2)): label_list_Li2O[i] = r"Li$_2$O - D $\times$ 10$^{" + f"{int(i - 3)}" + r"}$"
+for i in range(int(num_files/2), num_files): label_list_Li2O[i] = r"Li$_2$O - D $\times$ 10$^{" + f"{int(i - 3 - num_files/2)}" + r"}$"
 label_list_Fe = [""] * num_files
-label_list_Fe[0] = "Fe"
-label_list_Fe[int(num_files/2)] = "Fe"
+for i in range(int(num_files/2)): label_list_Fe[i] = r"Fe - D $\times$ 10$^{" + f"{int(i - 3)}" + r"}$"
+for i in range(int(num_files/2), num_files): label_list_Fe[i] = r"Fe - D $\times$ 10$^{" + f"{int(i - 3 - num_files/2)}" + r"}$"
 for i in range(int(num_files/2)):
     ax.plot(simulation_results_Fe[i][parameter_names.index('temperature')], simulation_results_Fe[i][parameter_names.index('avg_flux_total')], label=label_list_Fe[i], c='tab:blue', alpha = 1/1.5**i)
+for i in range(int(num_files/2)):
     ax.plot(simulation_results_Li2O[i][parameter_names.index('temperature')], simulation_results_Li2O[i][parameter_names.index('avg_flux_total')], label=label_list_Li2O[i], c='tab:orange', alpha = 1/1.5**i)
 
 ax.set_xlabel(u'Temperature (K)')
 ax.set_ylabel(u"Tritium flux (atom/m$^2$/s)")
-ax.legend(loc="best")
+ax.legend(loc=(1.01,0.05),ncols=1)
 ax.set_ylim(bottom=1e10,top=1e21)
 ax.set_yscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
@@ -244,11 +247,12 @@ ax = fig.add_subplot(gs[0])
 
 for i in range(int(num_files/2),num_files):
     ax.plot(simulation_results_Fe[i][parameter_names.index('temperature')], simulation_results_Fe[i][parameter_names.index('avg_flux_total')], label=label_list_Fe[i], c='tab:blue', alpha = 1/1.5**(i-int(num_files/2)))
+for i in range(int(num_files/2),num_files):
     ax.plot(simulation_results_Li2O[i][parameter_names.index('temperature')], simulation_results_Li2O[i][parameter_names.index('avg_flux_total')], label=label_list_Li2O[i], c='tab:orange', alpha = 1/1.5**(i-int(num_files/2)))
 
 ax.set_xlabel(u'Temperature (K)')
 ax.set_ylabel(u"Tritium flux (atom/m$^2$/s)")
-ax.legend(loc="best")
+ax.legend(loc=(1.01,0.05),ncols=1)
 ax.set_ylim(bottom=1e10,top=1e21)
 ax.set_yscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
