@@ -35,12 +35,13 @@
 width = 60
 input_file_name = 'EBSD_files/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.txt'
 output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4'
-bound_value_upper_limit = 1.01
+bound_value_upper_limit = 1.0001
 
 [Mesh]
   [ebsd_mesh]
     type = EBSDMeshGenerator
     filename = ${input_file_name}
+    # uniform_refine = 3
   []
 []
 
@@ -489,7 +490,7 @@ bound_value_upper_limit = 1.01
 [Adaptivity]
   initial_steps = 1
   max_h_level = 3
-  marker = combined
+  marker = bound_adapt
   [Indicators]
     [error]
       type = GradientJumpIndicator
@@ -500,8 +501,8 @@ bound_value_upper_limit = 1.01
     [bound_adapt]
       type = ValueThresholdMarker
       third_state = DO_NOTHING
-      coarsen = 0.999 #1.0
-      refine = 0.95 #0.95
+      coarsen = 1.1 #0.999 #1.0
+      refine = 1.1 #0.95 #0.95
       variable = bnds
       invert = true
     []
@@ -562,6 +563,6 @@ bound_value_upper_limit = 1.01
   []
   [exodus]
     type = Exodus
-    execute_on = 'INITIAL timestep_end'
+    execute_on = 'INITIAL FINAL'
   []
 []

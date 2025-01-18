@@ -36,7 +36,7 @@ diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
 solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
 solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 
-file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
+file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_uniform.e-s002"
 
 [Mesh]
   file = ${file_name}
@@ -74,10 +74,6 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
 []
 
 [AuxVariables]
-  # [cy_AEH] #composition used for the x-component of the AEH solve
-  #   order = FIRST
-  #   family = LAGRANGE
-  # []
   [phase_numbers]
     order = FIRST
     family = LAGRANGE
@@ -262,7 +258,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     type = ParsedMaterial
     f_name = 'diffusivity_in_phase'
     material_property_names = 'diffusivity_Fe diffusivity_Li2O'
-    function = 'diffusivity_Fe'
+    function = 'diffusivity_Li2O'
     outputs = exodus
   []
   [Diffusion_coefficient_solubility_Fe] # bulk diffusivity contribution
@@ -292,7 +288,7 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
     property_name = 'solubility_in_phase'
     coupled_variables = 'phase_numbers'
     material_property_names = 'solubility_Fe solubility_Li2O'
-    expression = 'solubility_Fe'
+    expression = 'solubility_Li2O'
     # outputs = 'exodus'
   []
   [Concentration_in_BC]
@@ -385,11 +381,12 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   petsc_options_iname = '-pc_type'
   petsc_options_value = 'lu'
 
+  automatic_scaling = true
   l_max_its = 50
   nl_max_its = 50
   l_tol = 1e-04
   l_abs_tol = 1e-50
-  nl_abs_tol = 1e-20
+  nl_abs_tol = 1e-10
   nl_rel_tol = 1e-10
 []
 
@@ -397,5 +394,5 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'AEH_Diffusion_Polycrystal_Tritium_Fe_output'
+  file_base = 'AEH_Diffusion_Polycrystal_Tritium_Li2O_uni_output'
 []
