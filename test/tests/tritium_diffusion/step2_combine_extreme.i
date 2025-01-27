@@ -38,9 +38,19 @@ solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa
 solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 solubility_order = 0.5
 file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
+figure_file_name = "D2000_H4_V4_PF025_phases.png"
 
 [Mesh]
-  file = ${file_name}
+  [exodus_mesh]
+    type = FileMeshGenerator
+    file = ${file_name}
+  []
+  [image]
+    input = exodus_mesh
+    type = ImageSubdomainGenerator
+    file = ${figure_file_name}
+    threshold = 150
+  []
 []
 
 [UserObjects]

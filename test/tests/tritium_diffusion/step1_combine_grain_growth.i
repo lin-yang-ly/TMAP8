@@ -33,14 +33,21 @@
 # of order paramaters must match the number of grains.
 
 width = 60
-input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.txt'
-output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025'
+input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.txt'
+figure_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025_phase_structure.png'
+output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025'
 bound_value_upper_limit = 1.0001
 
 [Mesh]
   [ebsd_mesh]
     type = EBSDMeshGenerator
     filename = ${input_file_name}
+  []
+  [image]
+    input = ebsd_mesh
+    type = ImageSubdomainGenerator
+    file = ${figure_file_name}
+    threshold = 150
   []
 []
 

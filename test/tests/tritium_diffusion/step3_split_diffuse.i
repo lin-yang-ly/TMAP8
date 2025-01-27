@@ -39,9 +39,33 @@ solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 solubility_order = 0.5
 
 # Modeling data from step 2
-diffusivity_Fe_step2 = '${units 1.17e9 at/nm^3/Pa}'
-# diffusivity_Li2O_step2 = '${units 1.40e7 at/nm^3/Pa}'
-file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
+# All Fe phase
+# diffusivity_mixture_step2 = '${units 1193528207.7975 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.00051924329827687 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.00051924329827687 at/nm^3/Pa}'
+# All Li2O phase
+diffusivity_mixture_step2 = '${units 14308033.551062 nm^2/s}'
+solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# D2000_H4_V4_PF0.25
+# diffusivity_mixture_step2 = '${units 22172807.194264 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# D2000_H4_V4_PF0.75
+# diffusivity_mixture_step2 = '${units 628611848.20157 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.000441169969419 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.00043753865179771 at/nm^3/Pa}'
+# D2000_H10_V10_PF0.25
+# diffusivity_mixture_step2 = '${units 620332477.96492 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.00039214718153151 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.00039396284034216 at/nm^3/Pa}'
+# D2000_H10_V10_PF0.75
+# diffusivity_mixture_step2 = '${units 25841146.513666 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
+output_file_name = "M1_Split_Tritium_Li2O_output"
 
 [Mesh]
   file = ${file_name}
@@ -86,20 +110,28 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   [Diff_c]
     type = MatDiffusion
     variable = concentration
-    diffusivity = ${diffusivity_Fe_step2}
+    diffusivity = ${diffusivity_mixture_step2}
   []
 []
 
 [BCs]
   [left_flux]
-    type = EquilibriumBC
-    Ko = ${solubility_prefactor_Fe}
-    activation_energy = '${solubility_energy_Fe}'
-    boundary = 'left right top bottom'
-    enclosure_var = ${P}
-    temperature = ${T}
+    type = FunctionDirichletBC
+    function = '${solubility_lef_mixture_step2} * ${P} ^ ${solubility_order}'
+    boundary = 'left'
     variable = concentration
-    p = ${solubility_order}
+  []
+  [right_flux]
+    type = FunctionDirichletBC
+    function = '${solubility_rgt_mixture_step2} * ${P} ^ ${solubility_order}'
+    boundary = 'right'
+    variable = concentration
+  []
+  [bottom_top_flux]
+    type = NeumannBC
+    value = 0
+    boundary = 'top bottom'
+    variable = concentration
   []
 []
 
@@ -207,5 +239,5 @@ file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'M1_Split_Tritium_Fe_output'
+  file_base = ${output_file_name}
 []

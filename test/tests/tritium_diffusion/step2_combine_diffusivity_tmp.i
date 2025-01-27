@@ -41,8 +41,7 @@ file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s
 figure_file_name = "D2000_H4_V4_PF025_phases.png"
 output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF025_output"
 
-jump_penalty = 1e1 # (-)
-bound_value_bottom_limit = -1e-20
+jump_penalty = 1e2 # (-)
 
 [Mesh]
   [exodus_mesh]
@@ -90,68 +89,57 @@ bound_value_bottom_limit = -1e-20
   []
 []
 
-[Bounds]
-  [concentration_Fe_lower_limit]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = concentration_Fe
-    bound_type = LOWER
-    bound_value = ${bound_value_bottom_limit}
-  []
-  [concentration_Li2O_lower_limit]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = concentration_Li2O
-    bound_type = LOWER
-    bound_value = ${bound_value_bottom_limit}
-  []
-[]
-
 [BCs]
+  # [BC_flux]
+  #   type = FunctionDirichletBC
+  #   function = 0 #concentration_in_BC
+  #   boundary = 'left right top bottom'
+  #   variable = concentration
+  # []
+  # [left_right_BC_Fe]
+  #   type = ADFunctorDirichletBC
+  #   functor = concentration_in_BC
+  #   boundary = 'left right'
+  #   variable = concentration_Fe
+  # []
   [left_right_BC_Fe]
     type = ADFunctionDirichletBC
     function = concentration_in_BC_Fe_func
     boundary = 'left right'
     variable = concentration_Fe
+    block = 0
   []
   [top_bottom_BC_Fe]
-    type = ADFunctionNeumannBC
-    function = 0
+    type = ADNeumannBC
+    value = 0
     boundary = 'top bottom'
     variable = concentration_Fe
+    block = 0
   []
-  # [top_bottom_BC_Fe]
-  #   type = ADFunctionDirichletBC
-  #   function = concentration_in_BC_Fe_func
-  #   boundary = 'top bottom'
-  #   variable = concentration_Fe
+  # [left_right_BC_Li2O]
+  #   type = ADFunctorDirichletBC
+  #   functor = concentration_in_BC
+  #   boundary = 'left right'
+  #   variable = concentration_Li2O
   # []
   [left_right_BC_Li2O]
     type = ADFunctionDirichletBC
-    function = concentration_in_BC_Li2O_func
+    functor = concentration_in_BC_Li2O_func
     boundary = 'left right'
     variable = concentration_Li2O
+    block = 1
   []
-  # [top_bottom_BC_Li2O]
-  #   type = ADNeumannBC
-  #   value = 0
-  #   boundary = 'top bottom'
-  #   variable = concentration_Li2O
-  # []
   [top_bottom_BC_Li2O]
-    type = ADFunctionDirichletBC
-    function = concentration_in_BC_Li2O_func
+    type = ADNeumannBC
+    value = 0
     boundary = 'top bottom'
     variable = concentration_Li2O
+    block = 1
   []
 []
 
 [AuxVariables]
   [phase_numbers]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [bounds_dummy]
     order = FIRST
     family = LAGRANGE
   []
@@ -316,21 +304,11 @@ bound_value_bottom_limit = -1e-20
     type = ElementIntegralMaterialProperty
     mat_prop = 1
   []
-  # [solubility_Fe]
-  #   type = ElementAverageValue
-  #   block = 0
-  #   variable = solubility_Fe
-  # []
-  # [solubility_Li2O]
-  #   type = ElementAverageValue
-  #   block = 1
-  #   variable = solubility_Li2O
-  # []
-  # [gold_solubility_ratio]
-  #   type = ParsedPostprocessor
-  #   pp_names = 'solubility_Fe solubility_Li2O'
-  #   expression = 'solubility_Fe / solubility_Li2O'
-  # []
+  [gold_solubility_ratio]
+    type = ParsedPostprocessor
+    pp_names = 'solubility_Fe solubility_Li2O'
+    expression = 'solubility_Fe / solubility_Li2O'
+  []
   [Fe_interface]
     type = SideAverageValue
     boundary = interface_Fe
@@ -356,23 +334,19 @@ bound_value_bottom_limit = -1e-20
 [Executioner]
   type = Transient
   scheme = bdf2
-  solve_type = NEWTON
-  petsc_options_iname = '-pc_type -snes_type'
-  petsc_options_value = 'lu vinewtonrsls'
 
-  nl_rel_tol = 1e-8
-  nl_abs_tol = 1e-12
-  end_time = 5e-2
-  dtmax = 1
-  automatic_scaling = true
+  nl_rel_tol = 1e-10
+  end_time = 2000
+  dtmax = 50
+  nl_max_its = 14
   [TimeStepper]
     type = IterationAdaptiveDT
     optimal_iterations = 12
     iteration_window = 1
-    growth_factor = 1.1
-    dt = 1e-7 # 2.37e-7
-    cutback_factor = 0.9
-    cutback_factor_at_failure = 0.9
+    growth_factor = 1.2
+    dt = 0.1 # 2.37e-7
+    cutback_factor = 0.75
+    cutback_factor_at_failure = 0.75
   []
 []
 
