@@ -37,11 +37,27 @@ diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
 solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
 solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 solubility_order = 0.5
-file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
-figure_file_name = "D2000_H4_V4_PF025_phases.png"
-output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF025_output"
 
-jump_penalty = 1e1 # (-)
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.png"
+# output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF025_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.png"
+# output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF075_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.png"
+# output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF025_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.png"
+# output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF075_output"
+# file_name = "gold/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.png"
+# output_file_name = "M2_Combine_Tritium_D_4000_H_10_V_10_PF025_output"
+file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+figure_file_name = "M2_ids_figures/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.png"
+output_file_name = "M2_Combine_Tritium_D_1000_H_4_V_4_PF025_output"
+
+jump_penalty = 1e6 # (-)
 bound_value_bottom_limit = -1e-20
 
 [Mesh]
@@ -53,7 +69,7 @@ bound_value_bottom_limit = -1e-20
     input = exodus_mesh
     type = ImageSubdomainGenerator
     file = ${figure_file_name}
-    threshold = 150
+    threshold = 60
   []
   [interface_Fe]
     type = SideSetsBetweenSubdomainsGenerator
@@ -114,11 +130,11 @@ bound_value_bottom_limit = -1e-20
     boundary = 'left right'
     variable = concentration_Fe
   []
-  [top_bottom_BC_Fe]
-    type = ADFunctionNeumannBC
-    function = 0
-    boundary = 'top bottom'
-    variable = concentration_Fe
+  [left_right_BC_Li2O]
+    type = ADFunctionDirichletBC
+    function = concentration_in_BC_Li2O_func
+    boundary = 'left right'
+    variable = concentration_Li2O
   []
   # [top_bottom_BC_Fe]
   #   type = ADFunctionDirichletBC
@@ -126,24 +142,24 @@ bound_value_bottom_limit = -1e-20
   #   boundary = 'top bottom'
   #   variable = concentration_Fe
   # []
-  [left_right_BC_Li2O]
-    type = ADFunctionDirichletBC
-    function = concentration_in_BC_Li2O_func
-    boundary = 'left right'
-    variable = concentration_Li2O
-  []
   # [top_bottom_BC_Li2O]
+  #   type = ADFunctionDirichletBC
+  #   function = concentration_in_BC_Li2O_func
+  #   boundary = 'top bottom'
+  #   variable = concentration_Li2O
+  # []
+  # [bottom_top_BC_Fe]
+  #   type = ADNeumannBC
+  #   value = 0
+  #   boundary = 'top bottom'
+  #   variable = concentration_Fe
+  # []
+  # [bottom_top_BC_Li2O]
   #   type = ADNeumannBC
   #   value = 0
   #   boundary = 'top bottom'
   #   variable = concentration_Li2O
   # []
-  [top_bottom_BC_Li2O]
-    type = ADFunctionDirichletBC
-    function = concentration_in_BC_Li2O_func
-    boundary = 'top bottom'
-    variable = concentration_Li2O
-  []
 []
 
 [AuxVariables]
@@ -274,8 +290,8 @@ bound_value_bottom_limit = -1e-20
   []
   [converter_to_regular]
     type = MaterialADConverter
-    ad_props_in = 'diffusivity_Fe diffusivity_Li2O'
-    reg_props_out = 'diffusivity_Fe_nonAD diffusivity_Li2O_nonAD'
+    ad_props_in = 'diffusivity_Fe diffusivity_Li2O solubility_Fe solubility_Li2O'
+    reg_props_out = 'diffusivity_Fe_nonAD diffusivity_Li2O_nonAD solubility_Fe_nonAD solubility_Li2O_nonAD'
     outputs = none
   []
 []
@@ -316,35 +332,54 @@ bound_value_bottom_limit = -1e-20
     type = ElementIntegralMaterialProperty
     mat_prop = 1
   []
-  # [solubility_Fe]
-  #   type = ElementAverageValue
-  #   block = 0
-  #   variable = solubility_Fe
-  # []
-  # [solubility_Li2O]
-  #   type = ElementAverageValue
-  #   block = 1
-  #   variable = solubility_Li2O
-  # []
-  # [gold_solubility_ratio]
-  #   type = ParsedPostprocessor
-  #   pp_names = 'solubility_Fe solubility_Li2O'
-  #   expression = 'solubility_Fe / solubility_Li2O'
-  # []
+  [solubility_Fe]
+    type = ElementAverageMaterialProperty
+    mat_prop = solubility_Fe_nonAD
+    outputs = none
+  []
+  [solubility_Li2O]
+    type = ElementAverageMaterialProperty
+    mat_prop = solubility_Li2O_nonAD
+    outputs = none
+  []
+  [gold_solubility_ratio]
+    type = ParsedPostprocessor
+    pp_names = 'solubility_Fe solubility_Li2O'
+    expression = 'solubility_Fe / solubility_Li2O'
+  []
   [Fe_interface]
     type = SideAverageValue
     boundary = interface_Fe
     variable = concentration_Fe
+    outputs = none
   []
   [Li2O_interface]
     type = SideAverageValue
     boundary = interface_Li2O
     variable = concentration_Li2O
+    outputs = none
   []
   [variable_ratio]
     type = ParsedPostprocessor
     pp_names = 'Fe_interface Li2O_interface'
     expression = 'Fe_interface / Li2O_interface'
+  []
+  [point_value_Fe]
+    type = PointValue
+    point = "-10 -10 0"
+    variable = concentration_Fe
+    outputs = none
+  []
+  [point_value_Li2O]
+    type = PointValue
+    point = "-10 -10 0"
+    variable = concentration_Li2O
+    outputs = none
+  []
+  [point_value]
+    type = ParsedPostprocessor
+    pp_names = 'point_value_Fe point_value_Li2O'
+    expression = 'point_value_Fe + point_value_Li2O'
   []
 []
 

@@ -37,19 +37,12 @@ diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
 solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
 solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 solubility_order = 0.5
-file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4.e-s002"
-figure_file_name = "D2000_H4_V4_PF025_phases.png"
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
 
 [Mesh]
   [exodus_mesh]
     type = FileMeshGenerator
     file = ${file_name}
-  []
-  [image]
-    input = exodus_mesh
-    type = ImageSubdomainGenerator
-    file = ${figure_file_name}
-    threshold = 150
   []
 []
 
@@ -92,25 +85,25 @@ figure_file_name = "D2000_H4_V4_PF025_phases.png"
   [Diff_c]
     type = MatDiffusion
     variable = concentration
-    diffusivity = diffusivity_Li2O
+    diffusivity = diffusivity_Fe
   []
 []
 
 [BCs]
-  [left_flux]
+  [left_right_flux]
     type = EquilibriumBC
-    Ko = ${solubility_prefactor_Li2O}
-    activation_energy = '${solubility_energy_Li2O}'
-    boundary = 'left right top bottom'
+    Ko = ${solubility_prefactor_Fe}
+    activation_energy = '${solubility_energy_Fe}'
+    boundary = 'left right'
     enclosure_var = ${P}
     temperature = ${T}
     variable = concentration
     p = ${solubility_order}
   []
-  # [left_flux]
-  #   type = DirichletBC
-  #   value = 1
-  #   boundary = 'left right top bottom'
+  # [bottom_top_flux]
+  #   type = ADNeumannBC
+  #   value = 0
+  #   boundary = 'top bottom'
   #   variable = concentration
   # []
 []
@@ -219,5 +212,5 @@ figure_file_name = "D2000_H4_V4_PF025_phases.png"
   exodus = true
   perf_graph = true
   csv = true
-  file_base = 'M2_Combine_Tritium_Li2O_output'
+  file_base = 'M2_Combine_Tritium_Fe_output'
 []

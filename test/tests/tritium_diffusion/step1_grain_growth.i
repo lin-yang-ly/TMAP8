@@ -33,8 +33,8 @@
 # of order paramaters must match the number of grains.
 
 width = 60
-input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.txt'
-output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025'
+input_file_name = 'EBSD_files/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.txt'
+output_file_name = 'Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025'
 bound_value_upper_limit = 1.0001
 
 [Mesh]

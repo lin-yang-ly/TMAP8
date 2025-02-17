@@ -43,29 +43,44 @@ solubility_order = 0.5
 # diffusivity_mixture_step2 = '${units 1193528207.7975 nm^2/s}'
 # solubility_lef_mixture_step2 = '${units 0.00051924329827687 at/nm^3/Pa}'
 # solubility_rgt_mixture_step2 = '${units 0.00051924329827687 at/nm^3/Pa}'
-# All Li2O phase
-diffusivity_mixture_step2 = '${units 14308033.551062 nm^2/s}'
-solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
-solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# output_file_name = "M1_Split_Tritium_Fe_output"
+# # All Li2O phase
+# diffusivity_mixture_step2 = '${units 14308033.551062 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# output_file_name = "M1_Split_Tritium_Li2O_output"
 # D2000_H4_V4_PF0.25
 # diffusivity_mixture_step2 = '${units 22172807.194264 nm^2/s}'
 # solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
 # solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# output_file_name = "M1_Split_Tritium_D_2000_H_4_V_4_PF025_output"
 # D2000_H4_V4_PF0.75
 # diffusivity_mixture_step2 = '${units 628611848.20157 nm^2/s}'
 # solubility_lef_mixture_step2 = '${units 0.000441169969419 at/nm^3/Pa}'
 # solubility_rgt_mixture_step2 = '${units 0.00043753865179771 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.e-s002"
+# output_file_name = "M1_Split_Tritium_D_2000_H_4_V_4_PF075_output"
 # D2000_H10_V10_PF0.25
+# diffusivity_mixture_step2 = '${units 25841146.513666	 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
+# output_file_name = "M1_Split_Tritium_D_2000_H_10_V_10_PF025_output"
+# D2000_H10_V10_PF0.75
 # diffusivity_mixture_step2 = '${units 620332477.96492 nm^2/s}'
 # solubility_lef_mixture_step2 = '${units 0.00039214718153151 at/nm^3/Pa}'
 # solubility_rgt_mixture_step2 = '${units 0.00039396284034216 at/nm^3/Pa}'
-# D2000_H10_V10_PF0.75
-# diffusivity_mixture_step2 = '${units 25841146.513666 nm^2/s}'
-# solubility_lef_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
-# solubility_rgt_mixture_step2 = '${units 0.0002287378885732 at/nm^3/Pa}'
-
-file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
-output_file_name = "M1_Split_Tritium_Li2O_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+# output_file_name = "M1_Split_Tritium_D_2000_H_10_V_10_PF075_output"
+# D4000_H10_V10_PF0.25
+diffusivity_mixture_step2 = '${units 33860772.202473 nm^2/s}'
+solubility_lef_mixture_step2 = '${units 0.00034857137007596 at/nm^3/Pa}'
+solubility_rgt_mixture_step2 = '${units 0.00034494005245466 at/nm^3/Pa}'
+file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+output_file_name = "M1_Split_Tritium_D_1000_H_4_V_4_PF025_output"
 
 [Mesh]
   file = ${file_name}
