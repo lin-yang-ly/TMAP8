@@ -70,17 +70,17 @@ solubility_order = 0.5
 # file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
 # output_file_name = "M1_Split_Tritium_D_2000_H_10_V_10_PF025_output"
 # D2000_H10_V10_PF0.75
-# diffusivity_mixture_step2 = '${units 620332477.96492 nm^2/s}'
-# solubility_lef_mixture_step2 = '${units 0.00039214718153151 at/nm^3/Pa}'
-# solubility_rgt_mixture_step2 = '${units 0.00039396284034216 at/nm^3/Pa}'
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
-# output_file_name = "M1_Split_Tritium_D_2000_H_10_V_10_PF075_output"
+diffusivity_mixture_step2 = '${units 620332477.96492 nm^2/s}'
+solubility_lef_mixture_step2 = '${units 0.00039214718153151 at/nm^3/Pa}'
+solubility_rgt_mixture_step2 = '${units 0.00039396284034216 at/nm^3/Pa}'
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+output_file_name = "M1_Split_Tritium_D_2000_H_10_V_10_PF075_output"
 # D4000_H10_V10_PF0.25
-diffusivity_mixture_step2 = '${units 33860772.202473 nm^2/s}'
-solubility_lef_mixture_step2 = '${units 0.00034857137007596 at/nm^3/Pa}'
-solubility_rgt_mixture_step2 = '${units 0.00034494005245466 at/nm^3/Pa}'
-file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
-output_file_name = "M1_Split_Tritium_D_1000_H_4_V_4_PF025_output"
+# diffusivity_mixture_step2 = '${units 33860772.202473 nm^2/s}'
+# solubility_lef_mixture_step2 = '${units 0.00034857137007596 at/nm^3/Pa}'
+# solubility_rgt_mixture_step2 = '${units 0.00034494005245466 at/nm^3/Pa}'
+# file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# output_file_name = "M1_Split_Tritium_D_1000_H_4_V_4_PF025_output"
 
 [Mesh]
   file = ${file_name}
@@ -219,6 +219,11 @@ output_file_name = "M1_Split_Tritium_D_1000_H_4_V_4_PF025_output"
     type = PointValue
     point = "-10 -10 0"
     variable = concentration
+  []
+  [mass_integral]
+    type = ElementIntegralVariablePostprocessor
+    variable = concentration
+    block = 0
   []
 []
 

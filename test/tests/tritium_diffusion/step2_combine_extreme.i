@@ -178,6 +178,24 @@ file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s
     point = "-10 -10 0"
     variable = concentration
   []
+  [flux_surface_left]
+    type = SideDiffusiveFluxIntegral
+    variable = concentration
+    diffusivity = 'diffusivity_Fe'
+    boundary = 'left'
+    # outputs = none
+  []
+  [flux_surface_right]
+    type = SideDiffusiveFluxIntegral
+    variable = concentration
+    diffusivity = 'diffusivity_Fe'
+    boundary = 'right'
+    # outputs = none
+  []
+  [mass_integral]
+    type = ElementIntegralVariablePostprocessor
+    variable = concentration
+  []
 []
 
 # It converges faster if all the residuals are at the same magnitude

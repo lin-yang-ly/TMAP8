@@ -59,7 +59,7 @@ def read_csv_from_TMAP8(file_name, parameter_names):
 ################################# 2D EXTREME ###################################
 ################################################################################
 
-parameter_names = ['time','point_value'] # s, atoms/nm^3
+parameter_names = ['time','point_value','mass_integral'] # s, atoms/nm^3
 
 # ============================================================================ #
 # Extract Fe and Li2O predictions in 2D model
@@ -136,7 +136,7 @@ ax.text(0.0005,1.0e17, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
 RMSE = np.sqrt(np.mean((tmap_M1_point_Li2O-tmap_M2_point_Li2O)**2) )
 RMSPE = RMSE*100/np.mean(tmap_M2_point_Li2O)
 ax.text(0.0052,0.3e17, 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold')
-plt.savefig('../figures/Fe_Li2O_M1_M2_comparison_2D.png', bbox_inches='tight', dpi=300)
+plt.savefig('../figures/Fe_Li2O_M1_M2_point_comparison_2D.png', bbox_inches='tight', dpi=300)
 plt.close(fig)
 
 
@@ -144,7 +144,7 @@ plt.close(fig)
 ########################## 2D multi-phases multi-sizes #########################
 ################################################################################
 
-parameter_names = ['time','point_value'] # s, atoms/nm^3
+parameter_names = ['time','point_value','mass_integral'] # s, atoms/nm^3, atom
 
 # ============================================================================ #
 # Extract Fe and Li2O predictions in 2D model
@@ -179,30 +179,35 @@ tmap_M1_time_list = []
 tmap_M2_time_list = []
 tmap_M1_point_list = []
 tmap_M2_point_list = []
+tmap_M1_mass_list = []
+tmap_M2_mass_list = []
 for i in range(len(file_name_list_M1)):
     chosen_matrix_M1 = ((M1_simulation_results_list[i][parameter_names.index('time')] >= start_time)
                     & (M1_simulation_results_list[i][parameter_names.index('time')] <= end_time))
     tmap_M1_time = M1_simulation_results_list[i][parameter_names.index('time')][chosen_matrix_M1]
     tmap_M1_point = M1_simulation_results_list[i][parameter_names.index('point_value')][chosen_matrix_M1]
+    tmap_M1_mass = M1_simulation_results_list[i][parameter_names.index('mass_integral')][chosen_matrix_M1]
     tmap_M1_time_list.append(tmap_M1_time)
     tmap_M1_point_list.append(tmap_M1_point)
+    tmap_M1_mass_list.append(tmap_M1_mass)
 
     chosen_matrix_M2 = ((M2_simulation_results_list[i][parameter_names.index('time')] >= start_time)
                     & (M2_simulation_results_list[i][parameter_names.index('time')] <= end_time))
     tmap_M2_time = M2_simulation_results_list[i][parameter_names.index('time')][chosen_matrix_M2]
     tmap_M2_point = M2_simulation_results_list[i][parameter_names.index('point_value')][chosen_matrix_M2]
+    tmap_M2_mass = M2_simulation_results_list[i][parameter_names.index('mass_integral')][chosen_matrix_M2]
     tmap_M2_time_list.append(tmap_M2_time)
     tmap_M2_point_list.append(tmap_M2_point)
+    tmap_M2_mass_list.append(tmap_M2_mass)
 
 # ============================================================================ #
 # Plot comparison of M1 and M2 between TMAP8 predictions
 
+# point
 fig = plt.figure(figsize=[6.5, 5.5])
 gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
-
 label_name = ["H4 V4 PF025", "H4 V4 PF075", "H10 V10 PF025", "H10 V10 PF075"]
-
 for i in range(len(file_name_list_M1)):
     ax.plot(tmap_M1_time_list[i], tmap_M1_point_list[i], label=f"M1 - {label_name[i]}", c=f"C{i}")
 for i in range(len(file_name_list_M2)):
@@ -217,12 +222,63 @@ ax.set_ylim(bottom=0)
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
 ax.minorticks_on()
 # error
-text_location = [[0.03,0.46e17],[0.01,1.41e17],[0.012,0.57e17],[0.01,1.18e17]]
+text_location = [[0.012,0.20e17],[0.01,1.41e17],[0.012,0.57e17],[0.01,1.18e17]]
 for i in range(len(file_name_list_M1)):
     RMSE = np.sqrt(np.mean((tmap_M1_point_list[i]-tmap_M2_point_list[i])**2) )
     RMSPE = RMSE*100/np.mean(tmap_M2_point_list[i])
     ax.text(text_location[i][0],text_location[i][1 ], 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold',c=f"C{i}")
-plt.savefig('../figures/multi_phases_M1_M2_comparison_2D.png', bbox_inches='tight', dpi=300)
+plt.savefig('../figures/multi_phases_M1_M2_point_comparison_2D.png', bbox_inches='tight', dpi=300)
+plt.close(fig)
+
+# mass_integral
+fig = plt.figure(figsize=[6.5, 5.5])
+gs = gridspec.GridSpec(1, 1)
+ax = fig.add_subplot(gs[0])
+for i in range(len(file_name_list_M1)):
+    ax.plot(tmap_M1_time_list[i], tmap_M1_mass_list[i], label=f"M1 - {label_name[i]}", c=f"C{i}")
+for i in range(len(file_name_list_M2)):
+    ax.plot(tmap_M2_time_list[i], tmap_M2_mass_list[i], '--', label=f"M2 - {label_name[i]}", c=f"C{i}")
+ax.set_xlabel(u'Time (s)')
+ax.set_ylabel(u"Total mass (atom)")
+ax.legend(loc="best")
+ax.set_ylim(bottom=0)
+# plt.yscale("log")
+plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
+ax.minorticks_on()
+# error
+text_location = [[0.014,1.4e5],[0.014,5.4e5],[0.014,2.6e5],[0.014,4.8e5]]
+for i in range(len(file_name_list_M1)):
+    RMSE = np.sqrt(np.mean((tmap_M1_mass_list[i]-tmap_M2_mass_list[i])**2) )
+    RMSPE = RMSE*100/np.mean(tmap_M2_mass_list[i])
+    ax.text(text_location[i][0],text_location[i][1 ], 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold',c=f"C{i}")
+plt.savefig('../figures/multi_phases_M1_M2_mass_comparison_2D.png', bbox_inches='tight', dpi=300)
+plt.close(fig)
+
+# effective diffusivity
+Fe_phase_fraction = np.array([0,0.25,0.75,1])
+effective_diffusivity_M1_16grains = np.array([14308033.551062,22172807.194264,628611848.20157,1193528207.7975]) * 1e-18 # nm^2/s -> m^2/s
+effective_diffusivity_M1_100grains = np.array([14308033.551062,25841146.513666,620332477.96492,1193528207.7975]) * 1e-18 # nm^2/s -> m^2/s
+fig = plt.figure(figsize=[6.5, 5.5])
+gs = gridspec.GridSpec(1, 1)
+ax = fig.add_subplot(gs[0])
+ax.plot(Fe_phase_fraction, effective_diffusivity_M1_16grains, label=f"M1 - 16 grains", c=f"C0")
+ax.plot(Fe_phase_fraction, effective_diffusivity_M1_100grains, label=f"M1 - 100 grains", c=f"C1")
+# for i in range(len(file_name_list_M2)):
+#     ax.plot(tmap_M2_time_list[i], tmap_M2_mass_list[i], '--', label=f"M2 - {label_name[i]}", c=f"C{i}")
+ax.set_xlabel(u'Fe phase fraction (-)')
+ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
+ax.legend(loc="best")
+# ax.set_ylim(bottom=0)
+plt.yscale("log")
+plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
+ax.minorticks_on()
+# error
+# text_location = [[0.014,1.5e5],[0.014,5.4e5],[0.014,2.6e5],[0.014,4.8e5]]
+# for i in range(len(file_name_list_M1)):
+#     RMSE = np.sqrt(np.mean((tmap_M1_mass_list[i]-tmap_M2_mass_list[i])**2) )
+#     RMSPE = RMSE*100/np.mean(tmap_M2_mass_list[i])
+#     ax.text(text_location[i][0],text_location[i][1 ], 'RMSPE = %.2f '%RMSPE+'%',fontweight='bold',c=f"C{i}")
+plt.savefig('../figures/multi_phases_M1_M2_effective_diffusivity_comparison_2D.png', bbox_inches='tight', dpi=300)
 plt.close(fig)
 
 

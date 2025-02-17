@@ -41,21 +41,26 @@ solubility_order = 0.5
 # file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.png"
 # output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF025_output"
+
 # file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.e-s002"
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.png"
 # output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF075_output"
+
 # file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.png"
 # output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF025_output"
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
-# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.png"
-# output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF075_output"
+
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.png"
+output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF075_output"
+
 # file_name = "gold/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.png"
 # output_file_name = "M2_Combine_Tritium_D_4000_H_10_V_10_PF025_output"
-file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
-figure_file_name = "M2_ids_figures/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.png"
-output_file_name = "M2_Combine_Tritium_D_1000_H_4_V_4_PF025_output"
+
+# file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.png"
+# output_file_name = "M2_Combine_Tritium_D_1000_H_4_V_4_PF025_output"
 
 jump_penalty = 1e6 # (-)
 bound_value_bottom_limit = -1e-20
@@ -71,19 +76,19 @@ bound_value_bottom_limit = -1e-20
     file = ${figure_file_name}
     threshold = 60
   []
-  [interface_Fe]
-    type = SideSetsBetweenSubdomainsGenerator
-    input = image
-    primary_block = '0' # Fe
-    paired_block = '1' # Li2O
-    new_boundary = 'interface_Fe'
-  []
   [interface_Li2O]
     type = SideSetsBetweenSubdomainsGenerator
-    input = interface_Fe
-    primary_block = '1' # Li2O
-    paired_block = '0' # Fe
+    input = image
+    primary_block = '0' # Li2O
+    paired_block = '1' # Fe
     new_boundary = 'interface_Li2O'
+  []
+  [interface_Fe]
+    type = SideSetsBetweenSubdomainsGenerator
+    input = interface_Li2O
+    primary_block = '1' # Fe
+    paired_block = '0' # Li2O
+    new_boundary = 'interface_Fe'
   []
 []
 
@@ -98,11 +103,11 @@ bound_value_bottom_limit = -1e-20
 [Variables]
   [concentration_Fe] # concentration in cermets
     initial_condition = 0.0
-    block = 0
+    block = 1
   []
   [concentration_Li2O] # concentration in cermets
     initial_condition = 0.0
-    block = 1
+    block = 0
   []
 []
 
@@ -171,6 +176,12 @@ bound_value_bottom_limit = -1e-20
     order = FIRST
     family = LAGRANGE
   []
+  # [concentration_combine_Fe]
+  # []
+  # [concentration_combine_Li2O]
+  # []
+  # [concentration_combine]
+  # []
 []
 
 [AuxKernels]
@@ -181,30 +192,48 @@ bound_value_bottom_limit = -1e-20
     solution = initial_grains
     from_variable = phase_numbers
   []
+  # [concentration_combine_Fe_kernel]
+  #   type = ParsedAux
+  #   variable = concentration_combine_Fe
+  #   coupled_variables = 'concentration_Fe'
+  #   expression = 'concentration_Fe'
+  # []
+  # [concentration_combine_Li2O_kernel]
+  #   type = ParsedAux
+  #   variable = concentration_combine_Li2O
+  #   coupled_variables = 'concentration_Li2O'
+  #   expression = 'concentration_Li2O'
+  # []
+  # [concentration_combine_kernel]
+  #   type = ParsedAux
+  #   variable = concentration_combine
+  #   coupled_variables = 'concentration_Fe concentration_Li2O'
+  #   expression = 'concentration_Fe + concentration_Li2O'
+  # []
 []
 
 [Kernels]
   [dc_dt_Fe]
     type = ADTimeDerivative
     variable = concentration_Fe
-    block = 0
+    block = 1
   []
   [Diff_c_Fe]
     type = ADMatDiffusion
     variable = concentration_Fe
     diffusivity = diffusivity_in_phase
-    block = 0
+    block = 1
   []
   [dc_dt_Li2O]
     type = ADTimeDerivative
     variable = concentration_Li2O
-    block = 1
+    block = 0
   []
   [Diff_c_Li2O]
     type = ADMatDiffusion
     variable = concentration_Li2O
     diffusivity = diffusivity_in_phase
-    block = 1
+    block = 0
   []
 []
 
@@ -290,8 +319,8 @@ bound_value_bottom_limit = -1e-20
   []
   [converter_to_regular]
     type = MaterialADConverter
-    ad_props_in = 'diffusivity_Fe diffusivity_Li2O solubility_Fe solubility_Li2O'
-    reg_props_out = 'diffusivity_Fe_nonAD diffusivity_Li2O_nonAD solubility_Fe_nonAD solubility_Li2O_nonAD'
+    ad_props_in = 'diffusivity_Fe diffusivity_Li2O diffusivity_in_phase solubility_Fe solubility_Li2O'
+    reg_props_out = 'diffusivity_Fe_nonAD diffusivity_Li2O_nonAD diffusivity_in_phase_nonAD solubility_Fe_nonAD solubility_Li2O_nonAD'
     outputs = none
   []
 []
@@ -381,6 +410,59 @@ bound_value_bottom_limit = -1e-20
     pp_names = 'point_value_Fe point_value_Li2O'
     expression = 'point_value_Fe + point_value_Li2O'
   []
+  [mass_integral_Fe]
+    type = ElementIntegralVariablePostprocessor
+    variable = concentration_Fe
+    block = 1
+  []
+  [mass_integral_Li2O]
+    type = ElementIntegralVariablePostprocessor
+    variable = concentration_Li2O
+    block = 0
+  []
+  [mass_integral]
+    type = ParsedPostprocessor
+    pp_names = 'mass_integral_Fe mass_integral_Li2O'
+    expression = 'mass_integral_Fe + mass_integral_Li2O'
+  []
+  # [flux_surface_Fe_left]
+  #   type = SideDiffusiveFluxIntegral
+  #   variable = concentration_Fe
+  #   diffusivity = 'diffusivity_in_phase_nonAD'
+  #   boundary = 'left'
+  #   outputs = none
+  # []
+  # [flux_surface_Fe_right]
+  #   type = SideDiffusiveFluxIntegral
+  #   variable = concentration_Fe
+  #   diffusivity = 'diffusivity_in_phase_nonAD'
+  #   boundary = 'right'
+  #   outputs = none
+  # []
+  # [flux_surface_Li2O_left]
+  #   type = SideDiffusiveFluxIntegral
+  #   variable = concentration_Li2O
+  #   diffusivity = 'diffusivity_in_phase_nonAD'
+  #   boundary = 'left'
+  #   outputs = none
+  # []
+  # [flux_surface_Li2O_right]
+  #   type = SideDiffusiveFluxIntegral
+  #   variable = concentration_Li2O
+  #   diffusivity = 'diffusivity_in_phase_nonAD'
+  #   boundary = 'right'
+  #   outputs = none
+  # []
+  # [flux_surface_left]
+  #   type = ParsedPostprocessor
+  #   pp_names = 'flux_surface_Fe_left flux_surface_Li2O_left'
+  #   expression = 'flux_surface_Fe_left + flux_surface_Li2O_left'
+  # []
+  # [flux_surface_right]
+  #   type = ParsedPostprocessor
+  #   pp_names = 'flux_surface_Fe_right flux_surface_Li2O_right'
+  #   expression = 'flux_surface_Fe_right + flux_surface_Li2O_right'
+  # []
 []
 
 # It converges faster if all the residuals are at the same magnitude
