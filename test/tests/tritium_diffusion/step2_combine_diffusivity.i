@@ -46,13 +46,13 @@ solubility_order = 0.5
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.png"
 # output_file_name = "M2_Combine_Tritium_D_2000_H_4_V_4_PF075_output"
 
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
-# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.png"
-# output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF025_output"
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
+figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.png"
+output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF025_output"
 
-file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
-figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.png"
-output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF075_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+# figure_file_name = "M2_ids_figures/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.png"
+# output_file_name = "M2_Combine_Tritium_D_2000_H_10_V_10_PF075_output"
 
 # file_name = "gold/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
 # figure_file_name = "M2_ids_figures/Polycrystal_Domain_4000_NumGrainHor_10_NumGrainVert_10_PF025.png"
@@ -479,7 +479,7 @@ bound_value_bottom_limit = -1e-20
 
   nl_rel_tol = 1e-8
   nl_abs_tol = 1e-12
-  end_time = 5e-2
+  end_time = 20e-2
   dtmax = 1
   automatic_scaling = true
   [TimeStepper]

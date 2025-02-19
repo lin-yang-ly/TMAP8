@@ -81,7 +81,7 @@ M2_simulation_results_Li2O[parameter_names.index('point_value')] = M2_simulation
 # select only the simulation data for desorption
 start_time = 0
 end_time_Fe = 0.05
-end_time_Fe_shorter = 3e-4
+end_time_Fe_shorter = 0.05
 end_time_Li2O = 0.05
 chosen_matrix = ((M1_simulation_results_Fe[parameter_names.index('time')]>=start_time)
                     & (M1_simulation_results_Fe[parameter_names.index('time')]<=end_time_Fe))
@@ -173,8 +173,9 @@ for i in range(len(file_name_list_M1)):
     M2_simulation_results_list.append(M2_simulation_results)
 
 # select only the simulation data for desorption
-start_time = 0
-end_time = 0.05
+start_time = 1e-7
+end_time = 0.008
+end_time_slower = 0.20
 tmap_M1_time_list = []
 tmap_M2_time_list = []
 tmap_M1_point_list = []
@@ -182,8 +183,12 @@ tmap_M2_point_list = []
 tmap_M1_mass_list = []
 tmap_M2_mass_list = []
 for i in range(len(file_name_list_M1)):
-    chosen_matrix_M1 = ((M1_simulation_results_list[i][parameter_names.index('time')] >= start_time)
-                    & (M1_simulation_results_list[i][parameter_names.index('time')] <= end_time))
+    if i == 0 or i == 2:
+        chosen_matrix_M1 = ((M1_simulation_results_list[i][parameter_names.index('time')] >= start_time)
+                    & (M1_simulation_results_list[i][parameter_names.index('time')] <= end_time_slower))
+    else:
+        chosen_matrix_M1 = ((M1_simulation_results_list[i][parameter_names.index('time')] >= start_time)
+                        & (M1_simulation_results_list[i][parameter_names.index('time')] <= end_time))
     tmap_M1_time = M1_simulation_results_list[i][parameter_names.index('time')][chosen_matrix_M1]
     tmap_M1_point = M1_simulation_results_list[i][parameter_names.index('point_value')][chosen_matrix_M1]
     tmap_M1_mass = M1_simulation_results_list[i][parameter_names.index('mass_integral')][chosen_matrix_M1]
@@ -191,8 +196,12 @@ for i in range(len(file_name_list_M1)):
     tmap_M1_point_list.append(tmap_M1_point)
     tmap_M1_mass_list.append(tmap_M1_mass)
 
-    chosen_matrix_M2 = ((M2_simulation_results_list[i][parameter_names.index('time')] >= start_time)
-                    & (M2_simulation_results_list[i][parameter_names.index('time')] <= end_time))
+    if i == 0 or i == 2:
+        chosen_matrix_M2 = ((M2_simulation_results_list[i][parameter_names.index('time')] >= start_time)
+                    & (M2_simulation_results_list[i][parameter_names.index('time')] <= end_time_slower))
+    else:
+        chosen_matrix_M2 = ((M2_simulation_results_list[i][parameter_names.index('time')] >= start_time)
+                        & (M2_simulation_results_list[i][parameter_names.index('time')] <= end_time))
     tmap_M2_time = M2_simulation_results_list[i][parameter_names.index('time')][chosen_matrix_M2]
     tmap_M2_point = M2_simulation_results_list[i][parameter_names.index('point_value')][chosen_matrix_M2]
     tmap_M2_mass = M2_simulation_results_list[i][parameter_names.index('mass_integral')][chosen_matrix_M2]
@@ -208,21 +217,22 @@ fig = plt.figure(figsize=[6.5, 5.5])
 gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
 label_name = ["H4 V4 PF025", "H4 V4 PF075", "H10 V10 PF025", "H10 V10 PF075"]
-for i in range(len(file_name_list_M1)):
+for i in [3,1,2,0]:
     ax.plot(tmap_M1_time_list[i], tmap_M1_point_list[i], label=f"M1 - {label_name[i]}", c=f"C{i}")
-for i in range(len(file_name_list_M2)):
+for i in [3,1,2,0]:
     ax.plot(tmap_M2_time_list[i], tmap_M2_point_list[i], '--', label=f"M2 - {label_name[i]}", c=f"C{i}")
 
 
 ax.set_xlabel(u'Time (s)')
 ax.set_ylabel(u"Tritium concentration (atom/m$^3$)")
 ax.legend(loc="best")
+ax.set_xlim(left=1e-5)
 ax.set_ylim(bottom=0)
-# plt.yscale("log")
+plt.xscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
 ax.minorticks_on()
 # error
-text_location = [[0.012,0.20e17],[0.01,1.41e17],[0.012,0.57e17],[0.01,1.18e17]]
+text_location = [[0.012,0.20e17],[2e-3,1.25e17],[0.012,1.65e17],[2.4e-3,1.48e17]]
 for i in range(len(file_name_list_M1)):
     RMSE = np.sqrt(np.mean((tmap_M1_point_list[i]-tmap_M2_point_list[i])**2) )
     RMSPE = RMSE*100/np.mean(tmap_M2_point_list[i])
@@ -234,19 +244,19 @@ plt.close(fig)
 fig = plt.figure(figsize=[6.5, 5.5])
 gs = gridspec.GridSpec(1, 1)
 ax = fig.add_subplot(gs[0])
-for i in range(len(file_name_list_M1)):
+for i in [3,1,0,2]:
     ax.plot(tmap_M1_time_list[i], tmap_M1_mass_list[i], label=f"M1 - {label_name[i]}", c=f"C{i}")
-for i in range(len(file_name_list_M2)):
+for i in [3,1,0,2]:
     ax.plot(tmap_M2_time_list[i], tmap_M2_mass_list[i], '--', label=f"M2 - {label_name[i]}", c=f"C{i}")
 ax.set_xlabel(u'Time (s)')
 ax.set_ylabel(u"Total mass (atom)")
 ax.legend(loc="best")
 ax.set_ylim(bottom=0)
-# plt.yscale("log")
+plt.xscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
 ax.minorticks_on()
 # error
-text_location = [[0.014,1.4e5],[0.014,5.4e5],[0.014,2.6e5],[0.014,4.8e5]]
+text_location = [[5e-3,4e5],[0.004,5.4e5],[5e-3,4.0e4],[0.002,4.8e5]]
 for i in range(len(file_name_list_M1)):
     RMSE = np.sqrt(np.mean((tmap_M1_mass_list[i]-tmap_M2_mass_list[i])**2) )
     RMSPE = RMSE*100/np.mean(tmap_M2_mass_list[i])
