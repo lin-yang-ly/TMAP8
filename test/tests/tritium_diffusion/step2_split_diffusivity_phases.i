@@ -43,10 +43,14 @@ solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 # output_file_name = "AEH_Diffusion_Tritium_D_2000_H_4_V_4_PF075_output"
 # file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
 # output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF025_output"
-file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
-output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF075_output"
+# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
+# output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF075_output"
 # file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
 # output_file_name = "AEH_Diffusion_Tritium_D_1000_H_4_V_4_PF025_output"
+
+Fe_fraction = "005"
+file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF${Fe_fraction}.e-s002"
+output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF${Fe_fraction}_output"
 
 [Mesh]
   file = ${file_name}
