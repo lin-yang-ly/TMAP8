@@ -33,8 +33,8 @@
 # of order paramaters must match the number of grains.
 
 width = 60
-input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_7_NumGrainVert_7_PF095.txt'
-output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_7_NumGrainVert_7_PF095'
+input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_12_NumGrainVert_12_PF095.txt'
+output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_12_NumGrainVert_12_PF095'
 bound_value_upper_limit = 1.0001
 simulation_time = 500
 
@@ -47,7 +47,7 @@ simulation_time = 500
 
 [GlobalParams]
   # Parameters used by several kernels that are defined globally to simplify input file
-  op_num = 10 # Number of grains
+  op_num = 12 # Number of grains
   var_name_base = gr # Base name of grains
 []
 

@@ -32,11 +32,16 @@
 # We are not using the GrainTracker in this example so the number
 # of order paramaters must match the number of grains.
 
-width = 60
-input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_7_NumGrainVert_7_PF095.txt'
-output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_7_NumGrainVert_7_PF095'
+# width = 10
+# input_file_name = 'EBSD_files/experiment_mario_microstructure_Fe_025_ebsd.txt'
+# output_file_name = 'Polycrystal_experiment_mario_PF025'
+width = 2
+input_file_name = 'EBSD_files/experiment_microstructure_Fe_010_ebsd.txt'
+output_file_name = 'Polycrystal_experiment_PF010'
 bound_value_upper_limit = 1.0001
-simulation_time = 500
+bound_value_lower_limit = 1e-10
+dt_initial = 0.2
+simulation_time = 7
 
 [Mesh]
   [ebsd_mesh]
@@ -47,7 +52,7 @@ simulation_time = 500
 
 [GlobalParams]
   # Parameters used by several kernels that are defined globally to simplify input file
-  op_num = 10 # Number of grains
+  op_num = 2 # Number of grains
   var_name_base = gr # Base name of grains
 []
 
@@ -66,7 +71,7 @@ simulation_time = 500
     type = GrainTracker
     threshold = 0.3
     compute_var_to_feature_map = true
-    compute_halo_maps = true # For displaying HALO fields
+    compute_halo_maps = false # For not displaying HALO fields
     remap_grains = true
     polycrystal_ic_uo = ebsd
     execute_on = 'initial timestep_end'
@@ -88,62 +93,76 @@ simulation_time = 500
     bound_type = upper
     bound_value = ${bound_value_upper_limit}
   []
-  [gr2_upper_bound]
+  # [gr2_upper_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr2
+  #   bound_type = upper
+  #   bound_value = ${bound_value_upper_limit}
+  # []
+  # [gr3_upper_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr3
+  #   bound_type = upper
+  #   bound_value = ${bound_value_upper_limit}
+  # []
+  # [gr4_upper_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr4
+  #   bound_type = upper
+  #   bound_value = ${bound_value_upper_limit}
+  # []
+  # [gr5_upper_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr5
+  #   bound_type = upper
+  #   bound_value = ${bound_value_upper_limit}
+  # []
+  [gr0_lower_bound]
     type = ConstantBounds
     variable = bounds_dummy
-    bounded_variable = gr2
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
+    bounded_variable = gr0
+    bound_type = lower
+    bound_value = ${bound_value_lower_limit}
   []
-  [gr3_upper_bound]
+  [gr1_lower_bound]
     type = ConstantBounds
     variable = bounds_dummy
-    bounded_variable = gr3
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
+    bounded_variable = gr1
+    bound_type = lower
+    bound_value = ${bound_value_lower_limit}
   []
-  [gr4_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr4
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
-  [gr5_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr5
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
-  [gr6_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr6
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
-  [gr7_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr7
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
-  [gr8_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr8
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
-  [gr9_upper_bound]
-    type = ConstantBounds
-    variable = bounds_dummy
-    bounded_variable = gr9
-    bound_type = upper
-    bound_value = ${bound_value_upper_limit}
-  []
+  # [gr2_lower_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr2
+  #   bound_type = lower
+  #   bound_value = ${bound_value_lower_limit}
+  # []
+  # [gr3_lower_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr3
+  #   bound_type = lower
+  #   bound_value = ${bound_value_lower_limit}
+  # []
+  # [gr4_lower_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr4
+  #   bound_type = lower
+  #   bound_value = ${bound_value_lower_limit}
+  # []
+  # [gr5_lower_bound]
+  #   type = ConstantBounds
+  #   variable = bounds_dummy
+  #   bounded_variable = gr5
+  #   bound_type = lower
+  #   bound_value = ${bound_value_lower_limit}
+  # []
 []
 
 [ICs]
@@ -166,18 +185,10 @@ simulation_time = 500
   [bnds]
     # Variable used to visualize the grain boundaries in the simulation
   []
-  # [./gt_indices]
-  #   order = CONSTANT
-  #   family = MONOMIAL
-  # [../]
   [unique_grains]
     order = CONSTANT
     family = MONOMIAL
   []
-  # [./unique_grains_ic]
-  #   order = CONSTANT
-  #   family = MONOMIAL
-  # [../]
   [aphi1]
     order = CONSTANT
     family = MONOMIAL
@@ -197,62 +208,6 @@ simulation_time = 500
   [phase_numbers]
     order = CONSTANT
     family = MONOMIAL
-  []
-  [ghost_regions]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halos]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo0]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo1]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo2]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo3]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo4]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo5]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo6]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo7]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo8]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [halo9]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [active_bounds_elemental]
-    order = CONSTANT
-    family = MONOMIAL
-  []
-  [pid]
-    family = MONOMIAL
-    order = CONSTANT
   []
   [bounds_dummy]
     order = FIRST
@@ -275,13 +230,6 @@ simulation_time = 500
     variable = bnds
     execute_on = 'initial timestep_end'
   []
-  # [./gt_indices]
-  #   type = FeatureFloodCountAux
-  #   variable = gt_indices
-  #   execute_on = 'initial timestep_end'
-  #   flood_counter = grain_tracker
-  #   field_display = VARIABLE_COLORING
-  # [../]
 
   # generate the unique ID from grain_tracker
   [unique_grains]
@@ -291,17 +239,6 @@ simulation_time = 500
     flood_counter = grain_tracker
     field_display = UNIQUE_REGION
   []
-
-  # The unique_grains_ic can output the unique_grains in initial condition from
-  # EBSD data
-  # [./unique_grains_ic]
-  #   type = FeatureFloodCountAux
-  #   variable = unique_grains_ic
-  #   execute_on = initial
-  #   flood_counter = ebsd
-  #   field_display = UNIQUE_REGION
-  # [../]
-
   # The phi will output the Euler angle from EBSD data, and the data structure
   # will change with the guide from grain_tracker
   [aphi1]
@@ -347,102 +284,6 @@ simulation_time = 500
     variable = phase_numbers
     execute_on = 'initial timestep_end'
   []
-  [ghosted_entities]
-    type = FeatureFloodCountAux
-    variable = ghost_regions
-    flood_counter = grain_tracker
-    field_display = GHOSTED_ENTITIES
-    execute_on = 'initial timestep_end'
-  []
-  [halos]
-    type = FeatureFloodCountAux
-    variable = halos
-    flood_counter = grain_tracker
-    field_display = HALOS
-    execute_on = 'initial timestep_end'
-  []
-  [halo0]
-    type = FeatureFloodCountAux
-    variable = halo0
-    map_index = 0
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo1]
-    type = FeatureFloodCountAux
-    variable = halo1
-    map_index = 1
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo2]
-    type = FeatureFloodCountAux
-    variable = halo2
-    map_index = 2
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo3]
-    type = FeatureFloodCountAux
-    variable = halo3
-    map_index = 3
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo4]
-    type = FeatureFloodCountAux
-    variable = halo4
-    map_index = 4
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo5]
-    type = FeatureFloodCountAux
-    variable = halo5
-    map_index = 5
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo6]
-    type = FeatureFloodCountAux
-    variable = halo6
-    map_index = 6
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo7]
-    type = FeatureFloodCountAux
-    variable = halo7
-    map_index = 7
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo8]
-    type = FeatureFloodCountAux
-    variable = halo8
-    map_index = 8
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [halo9]
-    type = FeatureFloodCountAux
-    variable = halo9
-    map_index = 9
-    field_display = HALOS
-    flood_counter = grain_tracker
-  []
-  [active_bounds_elemental]
-    type = FeatureFloodCountAux
-    variable = active_bounds_elemental
-    field_display = ACTIVE_BOUNDS
-    execute_on = 'initial timestep_end'
-    flood_counter = grain_tracker
-  []
-  [pid_aux]
-    type = ProcessorIDAux
-    variable = pid
-    execute_on = 'initial timestep_end'
-  []
 []
 
 [BCs]
@@ -474,14 +315,14 @@ simulation_time = 500
     T = 450 # Constant temperature of the simulation (for mobility calculation)
     wGB = ${width} #5 # Width of the diffuse GB
   []
-  [GB_type]
-    # The new developed Miso Bnds Aux Kernel
-    type = ComputeGBMisorientationType
-    ebsd_reader = ebsd_reader
-    grain_tracker = grain_tracker
-    output_properties = 'gb_type'
-    outputs = exodus
-  []
+  # [GB_type]
+  #   # The new developed Miso Bnds Aux Kernel
+  #   type = ComputeGBMisorientationType
+  #   ebsd_reader = ebsd_reader
+  #   grain_tracker = grain_tracker
+  #   output_properties = 'gb_type'
+  #   outputs = exodus
+  # []
   [GB_matrix]
     type = ADParsedMaterial
     property_name = GB_matrix
@@ -519,37 +360,37 @@ simulation_time = 500
   []
 []
 
-[Adaptivity]
-  initial_steps = 1
-  max_h_level = 2
-  marker = bound_adapt
-  [Indicators]
-    [error]
-      type = GradientJumpIndicator
-      variable = bnds
-    []
-  []
-  [Markers]
-    [bound_adapt]
-      type = ValueThresholdMarker
-      third_state = DO_NOTHING
-      coarsen = 1.1 #0.999 #1.0
-      refine = 1.1 #0.95 #0.95
-      variable = bnds
-      invert = true
-    []
-    [errorfrac]
-      type = ErrorFractionMarker
-      coarsen = 0.1
-      indicator = error
-      refine = 0.7
-    []
-    [combined]
-      type = ComboMarker
-      markers = 'bound_adapt errorfrac'
-    []
-  []
-[]
+# [Adaptivity]
+#   initial_steps = 1
+#   max_h_level = 2
+#   marker = bound_adapt
+#   [Indicators]
+#     [error]
+#       type = GradientJumpIndicator
+#       variable = bnds
+#     []
+#   []
+#   [Markers]
+#     [bound_adapt]
+#       type = ValueThresholdMarker
+#       third_state = DO_NOTHING
+#       coarsen = 1.1 #0.999 #1.0
+#       refine = 1.1 #0.95 #0.95
+#       variable = bnds
+#       invert = true
+#     []
+#     [errorfrac]
+#       type = ErrorFractionMarker
+#       coarsen = 0.1
+#       indicator = error
+#       refine = 0.7
+#     []
+#     [combined]
+#       type = ComboMarker
+#       markers = 'bound_adapt errorfrac'
+#     []
+#   []
+# []
 
 [Executioner]
   type = Transient # Type of executioner, here it is transient with an adaptive time step
@@ -576,10 +417,16 @@ simulation_time = 500
   [TimeStepper]
     type = IterationAdaptiveDT
     cutback_factor = 0.9
-    dt = 10
+    dt = ${dt_initial}
     growth_factor = 1.1
     optimal_iterations = 7
   []
+  # [Adaptivity]
+  #   initial_adaptivity = 1
+  #   refine_fraction = 1.0
+  #   coarsen_fraction = 0.0
+  #   max_h_level = 1
+  # []
 
   start_time = 0.0
   end_time = ${simulation_time}
@@ -595,6 +442,6 @@ simulation_time = 500
   []
   [exodus]
     type = Exodus
-    execute_on = 'INITIAL FINAL'
+    execute_on = 'INITIAL TIMESTEP_END'
   []
 []

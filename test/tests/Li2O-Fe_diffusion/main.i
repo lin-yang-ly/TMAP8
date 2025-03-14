@@ -60,6 +60,7 @@ solubility_constant_Fe = ${fparse 1.87e-6 / 3.016 * 55.845 * 4.04e28 / 1e18 / co
     sampler = sampler
     # input_files = 'Li2O_diffusion_2d.i'
     input_files = 'Fe_diffusion_2d.i'
+    cli_args = 'Outputs/console=false'
   []
 []
 

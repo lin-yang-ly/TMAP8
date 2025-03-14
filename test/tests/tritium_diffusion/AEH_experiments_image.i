@@ -1,27 +1,36 @@
 # MOOSE input file
-# Written by Lin Yang - Idaho National Laboratory
+# Written by Pierre-Clement Simon - Idaho National Laboratory
 #
 # Project:
-# Meso-scale Modeling of Tritium Transport in Cermets
+# TRISO fuel fission gas transport: Silver diffusion in silicon carbide
 #
 # Published with:
 # ---
 #
 # Phase Field Model:   Isotropic diffusion equation
-# type:                Steady-State
-# Grain structure:     Polycrystals with two phases (Fe - Li2O)
-# BCs:                 Periodic for AEH and fix for direct method
-# System:              tritium diffusion in polycrystals including multi-phases
+# type:                Transient
+# Grain structure:     Single grain
+# BCs:                 Fixed value on the right, flux on the left
 #
 #
 # Info:
-# - multi-phases
+# - Input file used to generate polycrystals for SiC
+#
+# Updates from previous file:
+# -
 #
 # Units
-# length: nm
-# time: s
+# length: --
+# time: --
 # energy: --
 # quantity: --
+
+# This simulation predicts GB migration of a 2D copper polycrystal with 15 grains
+# Mesh adaptivity (new system) and time step adaptivity are used
+# An AuxVariable is used to calculate the grain boundary locations
+# Postprocessors are used to record time step and the number of grains
+# We are not using the GrainTracker in this example so the number
+# of order paramaters must match the number of grains.
 
 # Physical constants
 R = '${units 8.31446261815324 J/mol/K}' # ideal gas constant based on number used in include/utils/PhysicalConstants.h
@@ -37,35 +46,51 @@ diffusivity_energy_Li2O = '${units ${fparse 81.73 * 1e3} J/mol}'
 solubility_prefactor_Li2O = '${units ${fparse 2.0568216e-05 * 4.04e28} at/m^3/Pa -> at/nm^3/Pa}' # at/m^3/Pa^0.5 -> at/nm^3/Pa^0.5
 solubility_energy_Li2O = '${units ${fparse 1290 * R} J/mol}'
 
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
-# output_file_name = "AEH_Diffusion_Tritium_D_2000_H_4_V_4_PF025_output"
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_4_NumGrainVert_4_PF075.e-s002"
-# output_file_name = "AEH_Diffusion_Tritium_D_2000_H_4_V_4_PF075_output"
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF025.e-s002"
-# output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF025_output"
-# file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_10_NumGrainVert_10_PF075.e-s002"
-# output_file_name = "AEH_Diffusion_Tritium_D_2000_H_10_V_10_PF075_output"
-# file_name = "gold/Polycrystal_Domain_1000_NumGrainHor_4_NumGrainVert_4_PF025.e-s002"
-# output_file_name = "AEH_Diffusion_Tritium_D_1000_H_4_V_4_PF025_output"
-
-Fe_fraction = "095"
-file_name = "gold/Polycrystal_Domain_2000_NumGrainHor_12_NumGrainVert_12_PF${Fe_fraction}.e-s002"
-output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_output"
+# figure_file_name = 'experiment_grayscale_figures/experiment_microstructure_Fe_050_phases.png'
+# output_file_name = 'AEH_experiment_microstructure_Fe_050'
+# figure_file_name = 'experiment_grayscale_figures/experiment_microstructure_Fe_025_phases.png'
+# output_file_name = 'AEH_experiment_microstructure_Fe_025'
+figure_file_name = 'experiment_grayscale_figures/experiment_microstructure_Fe_017_phases.png'
+output_file_name = 'AEH_experiment_microstructure_Fe_017'
+# figure_file_name = 'experiment_grayscale_figures/experiment_mario_microstructure_Fe_050_phases.png'
+# output_file_name = 'AEH_experiment_mario_microstructure_Fe_050'
 
 [Mesh]
-  file = ${file_name}
+  [image_mesh]
+    type = ImageMeshGenerator
+    dim = 2
+    file = ${figure_file_name}
+    scale_to_one = false
+  []
 []
 
-[GlobalParams]
-  op_num = 8
-  var_name_base = gr
+[ICs]
+  [./Fe_ic]
+    type = FunctionIC
+    function = image_Fe
+    variable = phase_Fe
+  [../]
+  [./Li2O_ic]
+    type = FunctionIC
+    function = image_Li2O
+    variable = phase_Li2O
+  [../]
 []
 
-[UserObjects]
-  [initial_grains]
-    type = SolutionUserObject
-    mesh = ${file_name}
-    timestep = LATEST
+[Functions]
+  [image_Li2O]
+    type = ImageFunction
+    file = ${figure_file_name}
+    threshold = 256
+    lower_value = 0
+    upper_value = 1
+  []
+  [image_Fe]
+    type = ImageFunction
+    file = ${figure_file_name}
+    threshold = 256
+    lower_value = 1
+    upper_value = 0
   []
 []
 
@@ -78,143 +103,10 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
   []
 []
 
-[BCs]
-  [Periodic]
-    [all]
-      auto_direction = 'x y'
-      variable = 'cx_AEH cy_AEH'
-    []
-  []
-[]
-
 [AuxVariables]
-  [phase_numbers]
-    order = FIRST
-    family = LAGRANGE
-  []
   [phase_Fe]
-    order = FIRST
-    family = LAGRANGE
   []
   [phase_Li2O]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr0]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr1]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr2]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr3]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr4]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr5]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr6]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [gr7]
-    order = FIRST
-    family = LAGRANGE
-  []
-[]
-
-[AuxKernels]
-  [phase_numbers]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = phase_numbers
-    solution = initial_grains
-    from_variable = phase_numbers
-  []
-  [phase_Fe]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Fe
-    gb_type_order = 1
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
-  []
-  [phase_Li2O]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Li2O
-    gb_type_order = 2
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
-  []
-  [init_grO]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr0
-    solution = initial_grains
-    from_variable = gr0
-  []
-  [init_gr1]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr1
-    solution = initial_grains
-    from_variable = gr1
-  []
-  [init_gr2]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr2
-    solution = initial_grains
-    from_variable = gr2
-  []
-  [init_gr3]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr3
-    solution = initial_grains
-    from_variable = gr3
-  []
-  [init_gr4]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr4
-    solution = initial_grains
-    from_variable = gr4
-  []
-  [init_gr5]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr5
-    solution = initial_grains
-    from_variable = gr5
-  []
-  [init_gr6]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr6
-    solution = initial_grains
-    from_variable = gr6
-  []
-  [init_gr7]
-    type = SolutionAux
-    execute_on = INITIAL
-    variable = gr7
-    solution = initial_grains
-    from_variable = gr7
   []
 []
 
@@ -243,29 +135,41 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
   []
 []
 
+[AuxKernels]
+[]
+
+[BCs]
+  [Periodic]
+    [all]
+      auto_direction = 'x y'
+      variable = 'cx_AEH cy_AEH'
+    []
+  []
+[]
+
 [Materials]
   #====================================================== Diffusion coefficients
   #====================== Diffusion coefficients - Basic values and coefficients
   [Diffusivity_Fe] # bulk diffusivity contribution
     type = ParsedMaterial
-    f_name = 'diffusivity_Fe'
+    property_name = 'diffusivity_Fe'
     constant_names = 'D0                              Ea'
     constant_expressions = '${diffusivity_prefactor_Fe}     ${diffusivity_energy_Fe}'
-    function = 'D0 * exp(-Ea / ${R} / ${T})'
+    expression = 'D0 * exp(-Ea / ${R} / ${T})'
   []
   [Diffusivity_Li2O] # bulk diffusivity contribution
     type = ParsedMaterial
-    f_name = 'diffusivity_Li2O'
+    property_name = 'diffusivity_Li2O'
     constant_names = 'D0                              Ea'
     constant_expressions = '${diffusivity_prefactor_Li2O}     ${diffusivity_energy_Li2O}'
-    function = 'D0 * exp(-Ea / ${R} / ${T})'
+    expression = 'D0 * exp(-Ea / ${R} / ${T})'
   []
   [Diffusion_in_phase]
     type = ParsedMaterial
-    f_name = 'diffusivity_in_phase'
-    args = 'phase_numbers'
+    property_name = 'diffusivity_in_phase'
+    coupled_variables = 'phase_Fe phase_Li2O'
     material_property_names = 'diffusivity_Fe diffusivity_Li2O'
-    function = '(2 - phase_numbers) * diffusivity_Fe + (phase_numbers - 1) * diffusivity_Li2O'
+    expression = 'phase_Fe * diffusivity_Fe + phase_Li2O * diffusivity_Li2O'
     outputs = 'exodus'
   []
   [Solubility_Fe] # bulk diffusivity contribution
@@ -285,9 +189,9 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
   [Solubility_in_phase]
     type = ParsedMaterial
     property_name = 'solubility_in_phase'
-    coupled_variables = 'phase_numbers'
+    coupled_variables = 'phase_Fe phase_Li2O'
     material_property_names = 'solubility_Fe solubility_Li2O'
-    expression = '(2 - phase_numbers) * solubility_Fe + (phase_numbers - 1) * solubility_Li2O'
+    expression = 'phase_Fe * solubility_Fe + phase_Li2O * solubility_Li2O'
     # outputs = 'exodus'
   []
   [Concentration_in_BC]
@@ -300,15 +204,15 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
   [phase_Fe_field]
     type = ADParsedMaterial
     property_name = phase_Fe_field
-    coupled_variables = 'phase_numbers'
-    expression = 'if(phase_numbers<1.5,1,0)'
+    coupled_variables = 'phase_Fe'
+    expression = 'phase_Fe'
     outputs = exodus
   []
   [phase_Li2O_field]
     type = ADParsedMaterial
     property_name = phase_Li2O_field
-    coupled_variables = 'phase_numbers'
-    expression = 'if(phase_numbers>1.5,1,0)'
+    coupled_variables = 'phase_Li2O'
+    expression = 'phase_Li2O'
     outputs = exodus
   []
 []
@@ -329,26 +233,6 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
     row = 1
     diffusion_coefficient = diffusivity_in_phase
     # execute_on = INITIAL
-  []
-  [effective_solubility_left]
-    type = SideAverageMaterialProperty
-    property = solubility_in_phase
-    boundary = left
-  []
-  [effective_solubility_right]
-    type = SideAverageMaterialProperty
-    property = solubility_in_phase
-    boundary = right
-  []
-  [effective_solubility_top]
-    type = SideAverageMaterialProperty
-    property = solubility_in_phase
-    boundary = top
-  []
-  [effective_solubility_bottom]
-    type = SideAverageMaterialProperty
-    property = solubility_in_phase
-    boundary = bottom
   []
   [effective_solubility]
     type = ElementAverageMaterialProperty
@@ -395,7 +279,6 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
   []
 []
 
-# It converges faster if all the residuals are at the same magnitude
 [Debug]
   show_var_residual_norms = true
 []
@@ -407,6 +290,38 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
     off_diag_column = 'cx_AEH cy_AEH'
   []
 []
+
+# [Adaptivity]
+#   initial_steps = 1
+#   max_h_level = 2
+#   marker = bound_adapt
+#   [Indicators]
+#     [error]
+#       type = GradientJumpIndicator
+#       variable = bnds
+#     []
+#   []
+#   [Markers]
+#     [bound_adapt]
+#       type = ValueThresholdMarker
+#       third_state = DO_NOTHING
+#       coarsen = 1.1 #0.999 #1.0
+#       refine = 1.1 #0.95 #0.95
+#       variable = bnds
+#       invert = true
+#     []
+#     [errorfrac]
+#       type = ErrorFractionMarker
+#       coarsen = 0.1
+#       indicator = error
+#       refine = 0.7
+#     []
+#     [combined]
+#       type = ComboMarker
+#       markers = 'bound_adapt errorfrac'
+#     []
+#   []
+# []
 
 [Executioner]
   type = Steady
@@ -429,8 +344,15 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
 []
 
 [Outputs]
-  exodus = true
-  perf_graph = true
   csv = true
+  perf_graph = true
   file_base = ${output_file_name}
+  [console]
+    type = Console
+    max_rows = 10
+  []
+  [exodus]
+    type = Exodus
+    execute_on = 'INITIAL FINAL'
+  []
 []
