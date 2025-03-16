@@ -68,7 +68,7 @@ parameter_names = ['D_x_AEH','D_y_AEH','Fe_phase_fraction','diffusivity_Fe_theor
 Fe_fraction_array = np.array(["0.05", "0.15", "0.25", "0.35", "0.45", "0.55", "0.65", "0.75", "0.85", "0.95"])
 file_name_list_M1 = []
 for i_micro in ["4", "7", "10", "12"]:
-    file_name_list_M1.append([f'../AEH_Diffusion_Tritium_D_2000_H_{i_micro}_V_{i_micro}_PF0{i_Fe_fraction[2:]}_output.csv' for i_Fe_fraction in Fe_fraction_array])
+    file_name_list_M1.append([f'../AEH_files/AEH_Diffusion_Tritium_D_2000_H_{i_micro}_V_{i_micro}_PF0{i_Fe_fraction[2:]}_output.csv' for i_Fe_fraction in Fe_fraction_array])
 num_micros = len(file_name_list_M1)
 num_fraction = len(Fe_fraction_array)
 print(f"{num_micros} x {num_fraction}")
@@ -125,9 +125,10 @@ plt.close(fig)
 
 file_name_list_experiment = []
 for i_micro in ["007", "010", "017", "025", "050"]:
-    file_name_list_experiment.append(f'../AEH_experiment_microstructure_Fe_{i_micro}.csv')
+    file_name_list_experiment.append(f'../AEH_files/AEH_experiment_microstructure_Fe_{i_micro}.csv')
 for i_micro in ["010", "025", "050"]:
-    file_name_list_experiment.append(f'../AEH_experiment_mario_microstructure_Fe_{i_micro}.csv')
+    for j_micro in range(202):
+        file_name_list_experiment.append(f'../AEH_files/AEH_experiment_mario_microstructure_Fe_{i_micro}_slide_{j_micro:03}.csv')
 print(f"experiment case: {len(file_name_list_experiment)}")
 # print(file_name_list_experiment)
 
@@ -160,7 +161,7 @@ ax.plot([0,1], [diffusivity_Fe_theory,diffusivity_Fe_theory], '--',c='gray')
 ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Li2O_theory], '--',c='gray')
 
 ax.plot(real_Fe_fraction_experiment[:5], effective_diffusivity_experiment[:5], '+', label="experiment - Malachi",c='k')
-ax.plot(real_Fe_fraction_experiment[5:], effective_diffusivity_experiment[5:], '^', label="experiment - Mario",c='k')
+ax.plot(real_Fe_fraction_experiment[5:], effective_diffusivity_experiment[5:], '.', label="experiment - Mario",c='k')
 
 ax.set_xlabel(u'Fe phase fraction (-)')
 ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
