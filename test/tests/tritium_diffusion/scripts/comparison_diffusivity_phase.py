@@ -123,12 +123,24 @@ plt.close(fig)
 # ============================================================================ #
 # Extract effective diffusivity in AEH model
 
+# include first five experiment AEH from malachi
 file_name_list_experiment = []
 for i_micro in ["007", "010", "017", "025", "050"]:
     file_name_list_experiment.append(f'../AEH_files/AEH_experiment_microstructure_Fe_{i_micro}.csv')
+experiment_AEH_malachi_num = int(len(file_name_list_experiment))
+# 606 experiment AEH from mario,
 for i_micro in ["010", "025", "050"]:
     for j_micro in range(202):
         file_name_list_experiment.append(f'../AEH_files/AEH_experiment_mario_microstructure_Fe_{i_micro}_slide_{j_micro:03}.csv')
+experiment_AEH_mario_num = int(len(file_name_list_experiment) - experiment_AEH_malachi_num)
+# one grain growth AEH from malachi
+for i_micro in ["010"]:
+    file_name_list_experiment.append(f'../AEH_files/AEH_Diffusion_Tritium_experiment_PF{i_micro}_output.csv')
+growth_AEH_malachi_num = int(len(file_name_list_experiment) - experiment_AEH_malachi_num - experiment_AEH_mario_num)
+# three grain growth AEH from mario
+for i_micro in ["010", "025", "050"]:
+    file_name_list_experiment.append(f'../AEH_files/AEH_Diffusion_Tritium_experiment_mario_PF{i_micro}_output.csv')
+growth_AEH_mario_num = int(len(file_name_list_experiment) - experiment_AEH_malachi_num - experiment_AEH_mario_num - growth_AEH_malachi_num)
 print(f"experiment case: {len(file_name_list_experiment)}")
 # print(file_name_list_experiment)
 
@@ -160,8 +172,12 @@ ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Fe_theory], '--', label=u"th
 ax.plot([0,1], [diffusivity_Fe_theory,diffusivity_Fe_theory], '--',c='gray')
 ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Li2O_theory], '--',c='gray')
 
-ax.plot(real_Fe_fraction_experiment[:5], effective_diffusivity_experiment[:5], '+', label="experiment - Malachi",c='k')
-ax.plot(real_Fe_fraction_experiment[5:], effective_diffusivity_experiment[5:], '.', label="experiment - Mario",c='k')
+num_one = int(experiment_AEH_malachi_num)
+num_two = int(experiment_AEH_malachi_num + experiment_AEH_mario_num)
+ax.plot(real_Fe_fraction_experiment[:num_one],
+        effective_diffusivity_experiment[:num_one], '+', label="experiment - Malachi",c='k')
+ax.plot(real_Fe_fraction_experiment[num_one:num_two],
+        effective_diffusivity_experiment[num_one:num_two], '.', label="experiment - Mario",c='k')
 
 ax.set_xlabel(u'Fe phase fraction (-)')
 ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
@@ -171,4 +187,15 @@ plt.yscale("log")
 plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
 ax.minorticks_on()
 plt.savefig('../figures/multi_phases_effective_diffusivity_comparison_x_2D_plus_experiment.png', bbox_inches='tight', dpi=300)
+
+num_three = int(num_two + growth_AEH_malachi_num)
+num_four = int(num_three + growth_AEH_mario_num)
+ax.plot(real_Fe_fraction_experiment[num_two:num_three],
+        effective_diffusivity_experiment[num_two:num_three], '+', label="experiment (smoothing) - Malachi",c='r')
+ax.plot(real_Fe_fraction_experiment[num_three:num_four],
+        effective_diffusivity_experiment[num_three:num_four], '.', label="experiment (smoothing) - Mario",c='r')
+
+ax.legend(loc="best")
+plt.savefig('../figures/multi_phases_effective_diffusivity_comparison_x_2D_plus_experiment_smoothing.png', bbox_inches='tight', dpi=300)
+
 plt.close(fig)

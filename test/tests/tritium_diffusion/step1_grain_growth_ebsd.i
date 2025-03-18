@@ -33,15 +33,15 @@
 # of order paramaters must match the number of grains.
 
 # width = 10
-# input_file_name = 'EBSD_files/experiment_mario_microstructure_Fe_025_ebsd.txt'
-# output_file_name = 'Polycrystal_experiment_mario_PF025'
+# input_file_name = 'EBSD_files/experiment_mario_microstructure_Fe_050_ebsd.txt'
+# output_file_name = 'Polycrystal_experiment_mario_PF050_test'
 width = 2
-input_file_name = 'EBSD_files/experiment_microstructure_Fe_010_ebsd.txt'
-output_file_name = 'Polycrystal_experiment_PF010'
+input_file_name = 'EBSD_files/experiment_microstructure_Fe_050_ebsd.txt'
+output_file_name = 'Polycrystal_experiment_PF050'
 bound_value_upper_limit = 1.0001
 bound_value_lower_limit = 1e-10
-dt_initial = 0.2
-simulation_time = 7
+dt_initial = 0.1
+simulation_time = 1
 
 [Mesh]
   [ebsd_mesh]
@@ -72,7 +72,7 @@ simulation_time = 7
     threshold = 0.3
     compute_var_to_feature_map = true
     compute_halo_maps = false # For not displaying HALO fields
-    remap_grains = true
+    remap_grains = false
     polycrystal_ic_uo = ebsd
     execute_on = 'initial timestep_end'
   []
