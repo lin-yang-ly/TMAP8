@@ -105,10 +105,12 @@ ax = fig.add_subplot(gs[0])
 label_list = ["16 grains", "49 grains", "100 grains", "144 grains"]
 color_list = [1,2,0,3]
 for i in range(num_micros):
-    ax.plot(real_Fe_fraction_with_boundary[i], effective_diffusivity_with_boundary[i], label=r"D$_{eff}$ - " + f"{label_list[i]}", c=f"C{color_list[i]}")
-ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Fe_theory], '--', label=u"theory", c=f"C0")
+    ax.plot(real_Fe_fraction_with_boundary[i], effective_diffusivity_with_boundary[i], '.', label=r"D$_{eff}$ - " + f"{label_list[i]}", c=f"C{color_list[i]}")
+# ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Fe_theory], '--', label=u"theory", c=f"C0")
 ax.plot([0,1], [diffusivity_Fe_theory,diffusivity_Fe_theory], '--',c='gray')
 ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Li2O_theory], '--',c='gray')
+ax.text(0.35, 1.6e7, u'diffusivity of Li$_2$O',fontweight='bold',c=f"k")
+ax.text(0.35, 9.5e8, u'diffusivity of Fe',fontweight='bold',c=f"k")
 ax.set_xlabel(u'Fe phase fraction (-)')
 ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
 ax.legend(loc="best")
@@ -167,17 +169,19 @@ ax = fig.add_subplot(gs[0])
 label_list = ["16 grains", "49 grains", "100 grains", "144 grains"]
 color_list = [1,2,0,3]
 for i in range(num_micros):
-    ax.plot(real_Fe_fraction_with_boundary[i], effective_diffusivity_with_boundary[i], label=r"D$_{eff}$ - " + f"{label_list[i]}", c=f"C{color_list[i]}")
-ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Fe_theory], '--', label=u"theory", c=f"C0")
+    ax.plot(real_Fe_fraction_with_boundary[i], effective_diffusivity_with_boundary[i], '.', label=r"D$_{eff}$ - " + f"{label_list[i]}", c=f"C{color_list[i]}")
+# ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Fe_theory], '--', label=u"theory", c=f"C0")
 ax.plot([0,1], [diffusivity_Fe_theory,diffusivity_Fe_theory], '--',c='gray')
 ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Li2O_theory], '--',c='gray')
+ax.text(0.35, 1.6e7, u'diffusivity of Li$_2$O',fontweight='bold',c=f"k")
+ax.text(0.35, 9.5e8, u'diffusivity of Fe',fontweight='bold',c=f"k")
 
 num_one = int(experiment_AEH_malachi_num)
 num_two = int(experiment_AEH_malachi_num + experiment_AEH_mario_num)
 ax.plot(real_Fe_fraction_experiment[:num_one],
-        effective_diffusivity_experiment[:num_one], '+', label="experiment - Malachi",c='k')
+        effective_diffusivity_experiment[:num_one], '+', label="experimental \nmicrostructure (Malachi)",c='k')
 ax.plot(real_Fe_fraction_experiment[num_one:num_two],
-        effective_diffusivity_experiment[num_one:num_two], '.', label="experiment - Mario",c='k')
+        effective_diffusivity_experiment[num_one:num_two], '.', label="experimental \nmicrostructure (Mario)",c='k')
 
 ax.set_xlabel(u'Fe phase fraction (-)')
 ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
@@ -191,9 +195,9 @@ plt.savefig('../figures/multi_phases_effective_diffusivity_comparison_x_2D_plus_
 num_three = int(num_two + growth_AEH_malachi_num)
 num_four = int(num_three + growth_AEH_mario_num)
 ax.plot(real_Fe_fraction_experiment[num_two:num_three],
-        effective_diffusivity_experiment[num_two:num_three], '+', label="experiment (smoothing) - Malachi",c='r')
+        effective_diffusivity_experiment[num_two:num_three], '+', label="smoothing experimental \nmicrostructure (Malachi)",c='C7')
 ax.plot(real_Fe_fraction_experiment[num_three:num_four],
-        effective_diffusivity_experiment[num_three:num_four], '.', label="experiment (smoothing) - Mario",c='r')
+        effective_diffusivity_experiment[num_three:num_four], '.', label="smoothing experimental \nmicrostructure (Mario)",c='C7')
 
 ax.legend(loc="best")
 plt.savefig('../figures/multi_phases_effective_diffusivity_comparison_x_2D_plus_experiment_smoothing.png', bbox_inches='tight', dpi=300)
