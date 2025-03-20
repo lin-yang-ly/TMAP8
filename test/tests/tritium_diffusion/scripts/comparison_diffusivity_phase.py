@@ -123,6 +123,64 @@ plt.close(fig)
 
 
 # ============================================================================ #
+# Extract effective diffusivity in AEH model without smoothing
+
+Fe_fraction_array = np.array(["0.05", "0.15", "0.25", "0.35", "0.45", "0.55", "0.65", "0.75", "0.85", "0.95"])
+file_name_list_M2 = []
+for i_micro in ["4", "7", "10", "12"]:
+    file_name_list_M2.append([f'../AEH_files/AEH_Diffusion_Tritium_D_2000_H_{i_micro}_V_{i_micro}_PF0{i_Fe_fraction[2:]}_0step_output.csv' for i_Fe_fraction in Fe_fraction_array])
+num_micros = len(file_name_list_M2)
+num_fraction = len(Fe_fraction_array)
+print(f"{num_micros} x {num_fraction}")
+
+M2_simulation_results_list = []
+effective_diffusivity_M2 = np.zeros((num_micros, num_fraction))
+real_Fe_fraction_M2 = np.zeros((num_micros, num_fraction))
+for i in range(len(file_name_list_M2)):
+    tmp_M2_simulation_results_list = []
+    for j in range(len(file_name_list_M2[i])):
+        # M2 results
+        file_name_M2 = file_name_list_M2[i][j]
+        M2_simulation_results = read_csv_from_TMAP8(file_name_M2, parameter_names) # read csv file
+        effective_diffusivity_M2[i,j] = M2_simulation_results[parameter_names.index('D_x_AEH')][-1]
+        real_Fe_fraction_M2[i,j] = M2_simulation_results[parameter_names.index('Fe_phase_fraction')][-1]
+        tmp_M2_simulation_results_list.append(M2_simulation_results)
+
+    M2_simulation_results_list.append(tmp_M2_simulation_results_list)
+# print(real_Fe_fraction)
+
+# ============================================================================ #
+# Plot effective diffusivity
+real_Fe_fraction_M2_with_boundary = np.hstack([np.zeros((num_micros, 1)), real_Fe_fraction_M2, np.ones((num_micros, 1))]) # np.insert(real_Fe_fraction, [0,10],[0,1])
+# print(real_Fe_fraction)
+effective_diffusivity_M2_with_boundary = np.hstack([np.ones((num_micros, 1))*diffusivity_Li2O_theory, effective_diffusivity_M2, np.ones((num_micros, 1))*diffusivity_Fe_theory]) # np.insert(effective_diffusivity, [0,10],[diffusivity_Li2O_theory,diffusivity_Fe_theory])
+
+fig = plt.figure(figsize=[6.5, 5.5])
+gs = gridspec.GridSpec(1, 1)
+ax = fig.add_subplot(gs[0])
+
+label_list = ["16 grains", "49 grains", "100 grains", "144 grains"]
+color_list = [1,2,0,3]
+for i in range(num_micros):
+    ax.plot(real_Fe_fraction_with_boundary[i], effective_diffusivity_with_boundary[i], '.', label=f"{label_list[i]}", c=f"C{color_list[i]}")
+for i in range(num_micros):
+    ax.plot(real_Fe_fraction_M2_with_boundary[i], effective_diffusivity_M2_with_boundary[i], 'o', markerfacecolor='none', label=r"non-smoothing " + f"{label_list[i]}", c=f"C{color_list[i]}")
+ax.plot([0,1], [diffusivity_Fe_theory,diffusivity_Fe_theory], '--',c='gray')
+ax.plot([0,1], [diffusivity_Li2O_theory,diffusivity_Li2O_theory], '--',c='gray')
+ax.text(0.35, 1.6e7, u'diffusivity of Li$_2$O',fontweight='bold',c=f"k")
+ax.text(0.35, 9.5e8, u'diffusivity of Fe',fontweight='bold',c=f"k")
+ax.set_xlabel(u'Fe phase fraction (-)')
+ax.set_ylabel(u"Effective diffusivity (m$^2$/s)")
+ax.legend(loc="best")
+# ax.set_ylim(bottom=0)
+plt.yscale("log")
+plt.grid(visible=True, which='major', color='0.65', linestyle='--', alpha=0.3)
+ax.minorticks_on()
+plt.savefig('../figures/multi_phases_effective_diffusivity_comparison_x_2D_0step.png', bbox_inches='tight', dpi=300)
+plt.close(fig)
+
+
+# ============================================================================ #
 # Extract effective diffusivity in AEH model
 
 # include first five experiment AEH from malachi

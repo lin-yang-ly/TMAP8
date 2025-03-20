@@ -92,14 +92,6 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
     order = FIRST
     family = LAGRANGE
   []
-  [phase_Fe]
-    order = FIRST
-    family = LAGRANGE
-  []
-  [phase_Li2O]
-    order = FIRST
-    family = LAGRANGE
-  []
   [gr0]
     order = FIRST
     family = LAGRANGE
@@ -141,24 +133,6 @@ output_file_name = "AEH_Diffusion_Tritium_D_2000_H_12_V_12_PF${Fe_fraction}_outp
     variable = phase_numbers
     solution = initial_grains
     from_variable = phase_numbers
-  []
-  [phase_Fe]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Fe
-    gb_type_order = 1
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
-  []
-  [phase_Li2O]
-    # Calculate the bnds for specific GB type
-    type = SolutionAuxMisorientationBoundary
-    variable = phase_Li2O
-    gb_type_order = 2
-    solution = initial_grains
-    from_variable = phase_numbers
-    execute_on = 'INITIAL TIMESTEP_END'
   []
   [init_grO]
     type = SolutionAux

@@ -36,7 +36,7 @@ width = 60
 input_file_name = 'EBSD_files/Polycrystal_Domain_2000_NumGrainHor_12_NumGrainVert_12_PF095.txt'
 output_file_name = 'Polycrystal_Domain_2000_NumGrainHor_12_NumGrainVert_12_PF095'
 bound_value_upper_limit = 1.0001
-simulation_time = 500
+simulation_time = 1
 
 [Mesh]
   [ebsd_mesh]
@@ -595,6 +595,6 @@ simulation_time = 500
   []
   [exodus]
     type = Exodus
-    execute_on = 'INITIAL FINAL'
+    execute_on = 'INITIAL'
   []
 []
